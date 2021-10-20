@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FXHASH project</title>
+    <script id="fxhash-snippet">
+      //---- do not edit the following code (you can indent as you wish)
+      let charSet='abcdef0163456789'
+      var fxhash=Array(64).fill(0).map(_=>charSet[(Math.random()*charSet.length)|0]).join('')
+      var fxhashValues=fxhash.match(/.{4}/g).map(s=>parseInt(s,16)).map(n=>n/(10**((''+n).length-1))).map(n=>n-(n|0))
+      var fxhashValues2=fxhash.match(/.{8}/g).map(s=>parseInt(s,16)).map(n=>n/(10**((''+n).length-1))).map(n=>n-(n|0))
+      //---- do not edit the following code
+    </script>
+  </head>
+  <body>
+
+    <!-- WEBPACK will inject the bundle.js here -->
+  </body>
+</html>
