@@ -31,7 +31,7 @@ $ npm i
 ## Start local environment
 
 ```sh
-$ npm run dev
+$ npm start
 ```
 
 This last command will start a local http server with [live reloading](https://webpack.js.org/configuration/dev-server/#devserverlivereload) enabled so that you can iterate faster on your projects. Open [http://localhost:8080](http://localhost:8080) to see your project in the browser.
