@@ -3,7 +3,7 @@ FXHASH Generative Token webpack boilerplate
 
 A boilerplate to automate and ease the creation of Generative Tokens on fxhash. This project uses [webpack](https://webpack.js.org/) and [webpack-dev-server](https://github.com/webpack/webpack-dev-server) to improve the development and deployment experience.
 
-Before diving into the development of your token, we recommend reading the [Guide to mint a Generative Token](TODO) to get some understanding of the process.
+Before diving into the development of your token, we recommend reading the [Guide to mint a Generative Token](https://fxhash.xyz/guide-mint-generative-token) to get some understanding of the process.
 
 
 # Scope of this project
@@ -99,6 +99,7 @@ Finally, you can mint your token using the same `project.zip`file.
 
 > Theses rules must be followed to ensure that your token will be future-proof, accepted by fxhash, and behave in the intended way
 
+* the zip file must be under 15 Mb
 * any path to a resource must be relative (./path/to/file.ext)
 * no external resources allowed, you must put all your resources in the `public/` folder (sub-folders are OK)
 * no network calls allowed (but calls to get resources from within your `public/` folder)
