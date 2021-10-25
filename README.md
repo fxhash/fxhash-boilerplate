@@ -5,6 +5,8 @@ A boilerplate to automate and ease the creation of Generative Tokens on fxhash. 
 
 Before diving into the development of your token, we recommend reading the [Guide to mint a Generative Token](https://fxhash.xyz/articles/guide-mint-generative-token) to get some understanding of the process.
 
+If you are looking for a simpler boilerplate, you can use the [fxhash simple boilerplate](https://github.com/fxhash/fxhash-simple-boilerplate) instead.
+
 
 # Scope of this project
 
