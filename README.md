@@ -61,11 +61,10 @@ fxhash requires you to use a javascript code snippet so that the platform can in
 **During the development stages, the snippet will generate a random hash each time the page is refreshed**. This way, it helps you reproduce the conditions in which your token will be executed on fxhash.
 
 It creates 3 variables:
-* `fxhash`: a 64 characters string representing a hexadecimal number
-* `fxhashValues`: an array of 16 pseudo-random values derived from the random hash
-* `fxhashValues2`: an array of 8 pseudo-random values derived from the random hash (with more precision than `fxhashValues`)
+- `fxhash`: a random 64 characters hexadecimal string. This particular variable will be hardcoded with a static hash when someone mints a token from your GT
+- `fxrand()`: a PRNG function that generates deterministic PRN between 0 and 1. **Simply use it instead of Math.random()**.
 
-You can use these values as inputs to your algorithms. *The boilerplate writes those values to the DOM as an example*.
+*The index.js of this boilerplate quickly demonstrates how to use these*.
 
 ## How do Generative Tokens work
 
@@ -104,4 +103,4 @@ Finally, you can mint your token using the same `project.zip`file.
 * no external resources allowed, you must put all your resources in the `public/` folder (sub-folders are OK)
 * no network calls allowed (but calls to get resources from within your `public/` folder)
 * you must handle any viewport size (by implementing a response to the `resize` event of the `window`)
-* you **cannot use random number generation without a seed** (the same input hash must always yield the same output), the hash can be used as a seed for instance
+* you **cannot use random number generation without a seed** (the same input hash must always yield the same output). The `fxrand` function does a very good job in that regard.
