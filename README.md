@@ -3,7 +3,7 @@ FXHASH Generative Token webpack boilerplate
 
 A boilerplate to automate and ease the creation of Generative Tokens on fxhash. This project uses [webpack](https://webpack.js.org/) and [webpack-dev-server](https://github.com/webpack/webpack-dev-server) to improve the development and deployment experience.
 
-Before diving into the development of your token, we recommend reading the [Guide to mint a Generative Token](https://fxhash.xyz/guide-mint-generative-token) to get some understanding of the process.
+Before diving into the development of your token, we recommend reading the [Guide to mint a Generative Token](https://fxhash.xyz/articles/guide-mint-generative-token) to get some understanding of the process.
 
 
 # Scope of this project
@@ -74,7 +74,7 @@ This is how Generative Tokens work on fxhash:
 * when a collector will mint its unique token from your Generative Token, a random hash will be hard-coded in the **fxhash code snippet**
 * the token will now have its own `index.html` file, with a **static** hash, ensuring its immutability 
 
-The [Guide to mint a Generative Token](TODO) give in-depth details about this process.
+The [Guide to mint a Generative Token](https://fxhash.xyz/articles/guide-mint-generative-token) give in-depth details about this process.
 
 
 # Publish your token
