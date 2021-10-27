@@ -4,7 +4,7 @@
     <title>FXHASH project</title>
     <script id="fxhash-snippet">
       //---- do not edit the following code (you can indent as you wish)
-      let charSet='abcdef0163456789'
+      let charSet='abcdef0123456789'
       var fxhash=Array(64).fill(0).map(_=>charSet[(Math.random()*charSet.length)|0]).join('')
       let hashes = fxhash.match(/.{16}/g).map(h => parseInt(h, 16))
       let sfc32 = (a, b, c, d) => {
