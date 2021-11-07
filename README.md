@@ -20,6 +20,8 @@ You will need to have [nodejs](https://nodejs.org/) installed.
 
 ## Installation
 
+> First, make sure that your node version is >= 14
+
 Clone the repository on your machine and move to the directory
 ```sh
 $ git clone https://github.com/fxhash/fxhash-webpack-boilerplate.git your_folder && cd your_folder
