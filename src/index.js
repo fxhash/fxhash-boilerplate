@@ -34,7 +34,7 @@ let sketch = function(p5) {
   };
 
   p5.draw = function() {
-    p5.random(seed);
+    p5.randomSeed(seed);
     p5.background("#FFD");
     p5.push();
     for (var i = 500; i >= 0; i--) {
