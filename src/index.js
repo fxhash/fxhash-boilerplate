@@ -5,6 +5,13 @@ console.log(fxhash)   // the 64 chars hex number fed to your algorithm
 console.log(fxrand()) // deterministic PRNG function, use it instead of Math.random()
 const seed = ~~(fxrand()*123456789);
 let s;
+
+const numCircles = ~~(fxrand()*500) + 100;
+
+window.$fxhashFeatures = {
+  "Density": numCircles > 500?"High":(numCircles<200?"Low":"Medium")
+}
+
 // note about the fxrand() function 
 // when the "fxhash" is always the same, it will generate the same sequence of
 // pseudo random numbers, always
@@ -37,7 +44,7 @@ let sketch = function(p5) {
     p5.randomSeed(seed);
     p5.background("#FFD");
     p5.push();
-    for (var i = 500; i >= 0; i--) {
+    for (var i = numCircles; i >= 0; i--) {
       let c = p5.color(p5.random(["#50B", "#313", "#713"]));
       c.setAlpha(13);
       p5.fill(c);
