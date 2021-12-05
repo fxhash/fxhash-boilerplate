@@ -2,7 +2,14 @@
   "name": "fxhash-boilerplate-webpack",
   "version": "1.0.0",
   "description": "a boilerplate to create a generative token on fxhash",
-  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fxhash/fxhash-webpack-boilerplate"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "main": "src/index.js",
   "author": "fxhash",
   "license": "MIT",
   "scripts": {
@@ -13,11 +20,11 @@
   "devDependencies": {
     "adm-zip": "^0.5.9",
     "copy-webpack-plugin": "^9.0.1",
-    "css-loader": "^6.4.0",
-    "html-webpack-plugin": "^5.4.0",
-    "style-loader": "^3.3.0",
-    "webpack": "^5.59.0",
+    "css-loader": "^6.5.1",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.64.4",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.3.1"
+    "webpack-dev-server": "^4.6.0"
   }
 }
