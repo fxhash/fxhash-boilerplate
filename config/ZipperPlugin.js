@@ -1,9 +1,11 @@
 const path = require("path")
 const AdmZip = require("adm-zip")
 
+// get the name of the base directory
+const projectName = path.basename(path.resolve('.'))
 
 const defaultOptions = {
-  outputPath: path.resolve(__dirname, "../dist-zipped/project.zip")
+  outputPath: path.resolve(__dirname, `../dist-zipped/${projectName}.zip`)
 }
 
 /**
