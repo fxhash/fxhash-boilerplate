@@ -2,5 +2,10 @@ node_modules/
 dist/
 dist-zipped/
 yarn.lock
-.idea
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.idea/
+.vscode/
 .DS_Store
