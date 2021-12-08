@@ -1,6 +1,5 @@
 const path = require("path")
 const AdmZip = require("adm-zip")
-const sanitize = require("sanitize-filename")
 
 // get the name of the base directory
 let projectName = path.basename(path.resolve('.'))
@@ -11,8 +10,8 @@ projectName = projectName.replace(/\s/g, '-')
 // lowercase the name
 projectName = projectName.toLowerCase()
 
-// replace eventual unsafe and invalid characters
-projectName = sanitize(projectName)
+// replace characters with URL compatible ones
+projectName = encodeURIComponent(projectName)
 
 const defaultOptions = {
   outputPath: path.resolve(__dirname, `../dist-zipped/${projectName}.zip`)
