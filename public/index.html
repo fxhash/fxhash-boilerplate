@@ -24,6 +24,9 @@
         }
       }
       var fxrand = sfc32(...hashes)
+      // true if preview mode active, false otherwise
+      // you can append preview=1 to the URL to simulate preview active
+      var isFxpreview = new URLSearchParams(window.location.search).get('preview') === "1"
       // call this method to trigger the preview
       function fxpreview() {
         console.log("fxhash: TRIGGER PREVIEW")
