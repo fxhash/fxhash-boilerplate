@@ -1,3 +1,6 @@
 body {
   background-color: lightblue;
+
+  /* leave it to hide the scrollbars */
+  overflow: hidden;
 }
