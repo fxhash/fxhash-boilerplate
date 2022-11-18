@@ -3,4 +3,5 @@ body {
 
   /* leave it to hide the scrollbars */
   overflow: hidden;
+  margin: 0;
 }
