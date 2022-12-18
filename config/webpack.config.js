@@ -15,6 +15,14 @@ module.exports = {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
+
+      // Loading shaders -- COPY THIS
+      {
+        test: /\.(glsl|vs|fs|vert|frag)$/i, 
+        exclude: /node_modules/, 
+        use: 'raw-loader',
+      }
+      // end :)
     ],
   },
   plugins: [

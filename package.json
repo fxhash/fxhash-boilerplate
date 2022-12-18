@@ -1,15 +1,18 @@
 {
-  "name": "fxhash-boilerplate-webpack",
+  "name": "atownterrain",
   "version": "1.0.0",
-  "description": "a boilerplate to create a generative token on fxhash",
+  "description": "terrestrial landscapes",
   "main": "index.js",
-  "author": "fxhash",
+  "author": "atown",
   "license": "MIT",
   "scripts": {
     "build": "webpack --config ./config/webpack.config.prod.js",
     "start": "webpack serve --config ./config/webpack.config.dev.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "raw-loader": "^4.0.2",
+    "three": "^0.147.0"
+  },
   "devDependencies": {
     "adm-zip": "^0.5.9",
     "copy-webpack-plugin": "^9.0.1",
