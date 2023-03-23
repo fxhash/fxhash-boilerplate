@@ -30,8 +30,9 @@
       var isFxpreview = search.get('preview') === "1"
       // call this method to trigger the preview
       function fxpreview() {
-        window.dispatchEvent(new Event("fxhash-preview"))
-        setTimeout(() => fxpreview(), 500)
+        console.log("FXPREVIEW")
+        // window.dispatchEvent(new Event("fxhash-preview"))
+        // setTimeout(() => fxpreview(), 500)
       }
       //
       // NEW: v2 of the fxhash SDK lol
