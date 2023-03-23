@@ -164,7 +164,11 @@
             }
             return rtn
           },
-          bytesLength: () => 64 * 2,
+          bytesLength: (options) => {
+            if (typeof options?.maxLength !== "undefined")
+                return Number(options.maxLength) * 2
+            return 64 * 2
+          },
           constrain: (value, definition) => {
             let min = 0
             if (typeof definition.options?.minLength !== "undefined")
@@ -172,7 +176,6 @@
             let max = 64
             if (typeof definition.options?.maxLength !== "undefined")
               max = definition.options.maxLength
-            max = Math.min(max, 64)
             let v = value.slice(0, max);
             if (v.length < min) {
               return v.padEnd(min)
@@ -186,7 +189,6 @@
             let max = 64
             if (typeof definition.options?.maxLength !== "undefined")
               max = definition.options.maxLength
-            max = Math.min(max, 64)
             const length = Math.round(Math.random() * (max - min) + min)
             return [...Array(length)]
               .map((i) => (~~(Math.random() * 36)).toString(36))
@@ -229,8 +231,8 @@
             continue
           }
           // extract the length from the bytes & shift the initial bytes string
-          const valueBytes = bytes.substring(0, processor.bytesLength() * 2)
-          bytes = bytes.substring(processor.bytesLength() * 2)
+          const valueBytes = bytes.substring(0, processor.bytesLength(def?.options) * 2)
+          bytes = bytes.substring(processor.bytesLength(def?.options) * 2)
           // deserialize the bytes into the params
           const value =  processor.deserialize(valueBytes, def)
           params[def.id] = processor.constrain?.(value, def) || value;
@@ -343,3 +345,4 @@
     <!-- WEBPACK will inject the bundle.js here -->
   </body>
 </html>
+
