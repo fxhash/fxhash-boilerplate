@@ -56,7 +56,7 @@ $fx.params([
     //default: "hello",
     options: {
       minLength: 1,
-      maxLength: 64
+      maxLength: 512
     }
   },
 ]);
