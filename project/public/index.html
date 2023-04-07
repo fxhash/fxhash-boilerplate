@@ -254,6 +254,7 @@
       }
 
       window.$fx = {
+        _version: "3.0.0",
         _processors: processors,
         // where params def & features will be stored
         _params: undefined,
@@ -309,27 +310,18 @@
         
       }
       window.addEventListener("message", (event) => {
-        if (event.data === "fxhash_getHash") {
+        if (event.data === "fxhash_getInfo") {
           parent.postMessage({
-            id: "fxhash_getHash",
-            data: window.$fx.hash
-          }, "*")
-        }
-        
-        if (event.data === "fxhash_getFeatures") {
-          parent.postMessage({
-            id: "fxhash_getFeatures",
-            data: window.$fx.getFeatures()
-          }, "*")
-        }
-
-        if (event.data === "fxhash_getParams") {
-          parent.postMessage({
-            id: "fxhash_getParams",
-            data: {
-              definitions: window.$fx.getDefinitions(),
-              values: window.$fx.getRawParams(),
-            }
+            id: "fxhash_getInfo",
+            data: { 
+              version: window.$fx._version,
+              hash: window.$fx.hash,
+              features: window.$fx.getFeatures(),
+              params: {
+                definitions: window.$fx.getDefinitions(),
+                values: window.$fx.getRawParams(),
+              },
+            },
           }, "*")
         }
       })
