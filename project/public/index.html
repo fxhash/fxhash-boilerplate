@@ -33,9 +33,6 @@
       hashes = fxminterTrunc.match(regex).map(h => b58dec(h))
       var fxrandminter = sfc32(...hashes)
 
-      // get the iteration #
-      var fxiter = parseInt(search.get("fxiter"))
-
       // true if preview mode active, false otherwise
       // you can append preview=1 to the URL to simulate preview active
       var isFxpreview = search.get('preview') === "1"
@@ -45,9 +42,6 @@
         // window.dispatchEvent(new Event("fxhash-preview"))
         // setTimeout(() => fxpreview(), 500)
       }
-      //
-      // NEW: v2 of the fxhash SDK lol
-      //
       // get the byte params from the URL
       let fxparams = search.get('fxparams')
       fxparams = fxparams ? fxparams.replace("0x", "") : fxparams
@@ -279,8 +273,6 @@
         minter: fxminter,
         randminter: fxrandminter,
 
-        iter: () => fxiter,
-
         preview: fxpreview,
         isPreview: isFxpreview,
         params: function(definition) {
@@ -338,6 +330,7 @@
                 definitions: window.$fx.getDefinitions(),
                 values: window.$fx.getRawParams(),
               },
+              minter: window.$fx.minter,
             },
           }, "*")
         }
