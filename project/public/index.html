@@ -7,8 +7,9 @@
       //---- do not edit the following code (you can indent as you wish)
       let search = new URLSearchParams(window.location.search)
       let alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
-      var fxhash = search.get('fxhash') || "oo" + Array(49).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join('')
       let b58dec = str=>[...str].reduce((p,c)=>p*alphabet.length+alphabet.indexOf(c)|0, 0)
+      // make fxrand from hash
+      var fxhash = search.get('fxhash') || "oo" + Array(49).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join('')
       let fxhashTrunc = fxhash.slice(2)
       let regex = new RegExp(".{" + ((fxhash.length/4)|0) + "}", 'g')
       let hashes = fxhashTrunc.match(regex).map(h => b58dec(h))
@@ -25,6 +26,16 @@
         }
       }
       var fxrand = sfc32(...hashes)
+      // make fxrandminter from minter address
+      var fxminter = search.get('fxminter') || "tz1" + Array(33).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join('')
+      let fxminterTrunc = fxminter.slice(3)
+      regex = new RegExp(".{" + ((fxminterTrunc.length/4)|0) + "}", 'g')
+      hashes = fxminterTrunc.match(regex).map(h => b58dec(h))
+      var fxrandminter = sfc32(...hashes)
+
+      // get the iteration #
+      var fxiter = parseInt(search.get("fxiter"))
+
       // true if preview mode active, false otherwise
       // you can append preview=1 to the URL to simulate preview active
       var isFxpreview = search.get('preview') === "1"
@@ -260,6 +271,12 @@
 
         hash: fxhash,
         rand: fxrand,
+
+        minter: fxminter,
+        randminter: fxrandminter,
+
+        iter: () => fxiter,
+
         preview: fxpreview,
         isPreview: isFxpreview,
         params: function(definition) {
@@ -310,6 +327,20 @@
           parent.postMessage({
             id: "fxhash_getHash",
             data: window.$fx.hash
+          }, "*")
+        }
+
+        if (event.data === "fxhash_getMinter") {
+          parent.postMessage({
+            id: "fxhash_getMinter",
+            data: window.$fx.minter
+          }, "*")
+        }
+
+        if (event.data === "fxhash_getIteration") {
+          parent.postMessage({
+            id: "fxhash_getIteration",
+            data: window.$fx.iter(),
           }, "*")
         }
         
