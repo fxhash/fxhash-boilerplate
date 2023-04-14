@@ -211,38 +211,39 @@
         rand: fxrand,
         preview: fxpreview,
         isPreview: isFxpreview,
-        params: function(definition) {
+
+        params(definition) {
           // todo: maybe do some validation on the dev side ?
           // or maybe not ?
           this._params = definition
           this._rawValues = deserializeParams(fxparams, definition)
           this._paramValues = transformParamValues(this._rawValues, definition)
         },
-        features: function(features) {
+        features(features) {
           this._features = features
         },
-        getFeature: function(id) {
+        getFeature(id) {
           return this._features[id]
         },
-        getFeatures: function() {
+        getFeatures() {
           return this._features
         },
-        getParam: function(id) {
+        getParam(id) {
           return this._paramValues[id]
         },
-        getParams: function() {
+        getParams() {
           return this._paramValues
         },
-        getRawParam: function(id) {
+        getRawParam(id) {
           return this._rawValues[id]
         },
-        getRawParams: function() {
+        getRawParams() {
           return this._rawValues
         },
-        getDefinitions: function() {
-          return this._params;
+        getDefinitions() {
+          return this._params
         },
-        stringifyParams: function(params) {
+        stringifyParams(params) {
           return JSON.stringify(
             params,
             (key, value) => {
