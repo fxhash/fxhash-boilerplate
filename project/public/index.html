@@ -40,177 +40,128 @@
       let fxparams = search.get('fxparams')
       fxparams = fxparams ? fxparams.replace("0x", "") : fxparams
 
+      function* asBytes(hex, n) {
+				n *= 2
+				for (let i = 0; i < n; i += 2)
+					yield parseInt(hex.substring(i, i + 2), 16)
+			}
+
+			function minmax($min, $max, minDef = Number.MIN_SAFE_INTEGER, maxDef = Number.MAX_SAFE_INTEGER) {
+        return {
+          min:
+            $min !== undefined
+              ? Math.max(Number($min), minDef)
+              : minDef,
+          max:
+            $max !== undefined
+              ? Math.min(Number($max), maxDef)
+              : maxDef,
+        }
+      }
+      
       // the parameter processor, used to parse fxparams
       const processors = {
         number: {
-          deserialize: (input) => {
-            const view = new DataView(new ArrayBuffer(8))
-            for (let i = 0; i < 8; i++) {
-              view.setUint8(i, parseInt(input.substring(i * 2, i * 2 + 2), 16))
-            }
-            return view.getFloat64(0)
-          },
           bytesLength: () => 8,
-          constrain: (value, definition) =>  {
-            let min = Number.MIN_SAFE_INTEGER
-            if (typeof definition.options?.min !== "undefined")
-              min = Number(definition.options.min)
-            let max = Number.MAX_SAFE_INTEGER
-            if (typeof definition.options?.max !== "undefined")
-              max = Number(definition.options.max)
-            max = Math.min(max, Number.MAX_SAFE_INTEGER)
-            min = Math.max(min, Number.MIN_SAFE_INTEGER)
-            const v = Math.min(Math.max(value, min), max)
-            return v;
-          },
-          random: (definition) => {
-            let min = Number.MIN_SAFE_INTEGER
-            if (typeof definition.options?.min !== "undefined")
-              min = Number(definition.options.min)
-            let max = Number.MAX_SAFE_INTEGER
-            if (typeof definition.options?.max !== "undefined")
-              max = Number(definition.options.max)
-            max = Math.min(max, Number.MAX_SAFE_INTEGER)
-            min = Math.max(min, Number.MIN_SAFE_INTEGER)
-            const v = Math.random() * (max - min) + min
-            if (definition?.options?.step) {
-              const t = 1.0 / definition?.options?.step
-              return Math.round(v * t) / t
-            }
-            return v; 
-          },
+          deserialize: (input) => new Float64Array(new BigUint64Array([BigInt(`0x${input}`)]).buffer)[0],
+          constrain: (value, { options }) => {
+						const { min, max } = minmax(options?.min, options?.max)
+						return Math.min(Math.max(value, min), max)
+					},
+          random: ({ options }) => {
+						const { min, max } = minmax(options?.min, options?.max)
+						const v = Math.random() * (max - min) + min
+						if (options?.step) {
+							const t = 1.0 / options.step
+							return Math.round(v * t) / t
+						}
+						return v
+					},
         },
         bigint: {
-          deserialize: (input) => {
-            const view = new DataView(new ArrayBuffer(8))
-            for (let i = 0; i < 8; i++) {
-              view.setUint8(i, parseInt(input.substring(i * 2, i * 2 + 2), 16))
-            }
-            return view.getBigInt64(0)
-          },
           bytesLength: () => 8,
-          random: (definition) => {
-            const MIN_SAFE_INT64 = -9223372036854775808n
-            const MAX_SAFE_INT64 = 9223372036854775807n
-            let min = MIN_SAFE_INT64
-            let max = MAX_SAFE_INT64
-            if (typeof definition.options?.min !== "undefined")
-              min = BigInt(definition.options.min)
-            if (typeof definition.options?.max !== "undefined")
-              max = BigInt(definition.options.max)
-            const range = max - min
-            const bits = range.toString(2).length
-            let random
-            do {
-              random = BigInt(
-                "0b" +
-                  Array.from(
-                    crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8)))
-                  )
-                    .map((b) => b.toString(2).padStart(8, "0"))
-                    .join("")
-              )
-            } while (random > range)
-            return random + min
-          },
+          deserialize: (input) => BigInt.asIntN(64, BigInt("0x" + input)),
+          random: ({ options }) => {
+						const MIN_SAFE_INT64 = -9223372036854775808n
+						const MAX_SAFE_INT64 = 9223372036854775807n
+						if (options?.min !== undefined) {
+							min = BigInt(options.min)
+							if (min < MIN_SAFE_INT64) min = MIN_SAFE_INT64
+						}
+						if (options?.max !== undefined) {
+							max = BigInt(options.max)
+							if (max > MAX_SAFE_INT64) max = MAX_SAFE_INT64
+						}
+						const range = max - min
+						const bits = range.toString(2).length
+						let random
+						do {
+							random = BigInt(
+								"0x" +
+									Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8))))
+										.map((x) => x < 10 ? "0" + x : x.toString(16))
+										.join("")
+							)
+						} while (random > range)
+						return random + min
+					},
         },
         boolean: {
-          // if value is "00" -> 0 -> false, otherwise we consider it's 1
-          deserialize: (input) => {
-            return input === "00" ? false : true
-          },
           bytesLength: () => 1,
+          deserialize: (input) => input !== "00",
           random: () => Math.random() < 0.5,
         },
         color: {
-          deserialize: (input) => input,
           bytesLength: () => 4,
+          deserialize: (input) => input,
           transform: (input) => {
-            const r = parseInt(input.slice(0,2), 16)
-            const g = parseInt(input.slice(2,4), 16)
-            const b = parseInt(input.slice(4,6), 16)
-            const a = parseInt(input.slice(6,8), 16)
-            return {
-              hex: {
-                rgb: '#' + input.slice(0,6),
-                rgba: '#' + input,
-              },
-              obj: {
-                rgb: { r, g, b},
-                rgba: { r, g, b, a},
-              },
-              arr: {
-                rgb: [r,g,b],
-                rgba: [r,g,b,a],
-              }
-            }
-          },
-          constrain: (value, definition) => {
-            const hex = value.replace("#", "")
-            return hex.slice(0, 8).padEnd(8, "f")
-          },
-          random: () =>
-            `${[...Array(8)]
-              .map(() => Math.floor(Math.random() * 16).toString(16))
-              .join("")}`,
-          },
+						const [r, g, b, a] = asBytes(input, 4)
+						return {
+							hex: {
+								rgb: "#" + input.slice(0, 6),
+								rgba: "#" + input,
+							},
+							obj: {
+								rgb: { r, g, b },
+								rgba: { r, g, b, a },
+							},
+							arr: {
+								rgb: [r, g, b],
+								rgba: [r, g, b, a],
+							},
+						}
+					},
+          constrain: (value) => value.replace("#", "").slice(0, 8).padEnd(8, "f"),
+          random: () => ((Math.random() * 0x100000000) >>> 0).toString(16).padStart(8, "0"),
+        },
         string: {
+          bytesLength: () => 64,
           deserialize: (input) => {
-            const hx = input.match(/.{1,4}/g) || []
-            let rtn = ""
-            for (let i = 0; i < hx.length; i++) {
-              const int = parseInt(hx[i], 16)
-              if (int === 0) break
-              rtn += String.fromCharCode(int)
-            }
-            return rtn
-          },
-          bytesLength: () => 64 * 2,
-          constrain: (value, definition) => {
-            let min = 0
-            if (typeof definition.options?.minLength !== "undefined")
-              min = definition.options.minLength
-            let max = 64
-            if (typeof definition.options?.maxLength !== "undefined")
-              max = definition.options.maxLength
-            max = Math.min(max, 64)
-            let v = value.slice(0, max);
-            if (v.length < min) {
-              return v.padEnd(min)
-            }
-            return v;
-          },
-          random: (definition) => {
-            let min = 0
-            if (typeof definition.options?.minLength !== "undefined")
-              min = definition.options.minLength
-            let max = 64
-            if (typeof definition.options?.maxLength !== "undefined")
-              max = definition.options.maxLength
-            max = Math.min(max, 64)
-            const length = Math.round(Math.random() * (max - min) + min)
-            return [...Array(length)]
-              .map((i) => (~~(Math.random() * 36)).toString(36))
-              .join("")
-          },
+						const buf = new Uint8Array(asBytes(input, 64))
+						const idx = buf.indexOf(0)
+						return new TextDecoder().decode(idx !== -1 ? buf.slice(0, idx) : buf)
+					},
+          constrain: (value, { options }) => {
+						const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64)
+						return value.length > max
+							? value.slice(0, max)
+							: value.length < min
+							? value.padEnd(min)
+							: value
+					},
+          random: ({ options }) => {
+						const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64)
+						const length = Math.round(Math.random() * (max - min) + min)
+						return [...Array(length)].map(() => (~~(Math.random() * 36)).toString(36)).join("")
+					},
         },
         select: {
-          deserialize: (input, definition) => {
-            return definition.options.options[parseInt(input, 16)] || definition.default
-          },
           bytesLength: () => 1,
-          constrain: (value, definition) => {
-            if(definition.options.options.includes(value)) {
-              return value;
-            }
-            return definition.options.options[0]
-          },
-          random: (definition) => {
-            const index = Math.round(
-              Math.random() * (definition?.options?.options?.length - 1) + 0
-            )
-            return definition?.options?.options[index]
-          },
+          deserialize: (input, def) => def.options.options[parseInt(input, 16)] || def.default,
+          constrain: (value, { options }) => options.options.includes(value)
+            ? value
+            : options.options[0],
+          random: ({ options }) => options.options[~~(Math.random() * options.options.length)],
         }
       }
 
