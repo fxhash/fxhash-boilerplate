@@ -167,16 +167,14 @@
 
       // takes the parameters as bytes and outputs an object with the
       // deserialized parameters, identified by their id in an object
-      const deserializeParams = (bytes, definition) => {
+      const deserializeParams = (bytes, definitions) => {
         const params = {}
-        for (const def of definition) {
+        for (const def of definitions) {
           const processor = processors[def.type]
           // if we don't have any parameters defined in the URL, set the 
           // default value and move on
           if (!bytes) {
-            let v
-            if (typeof def.default === "undefined") v = processor.random(def)
-            else v = def.default
+            const v = def.default === undefined ? processor.random(def) : def.default
             params[def.id] = processor.constrain?.(v, def) || v
             continue
           }
