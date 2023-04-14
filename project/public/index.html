@@ -52,15 +52,15 @@
 					yield parseInt(hex.substring(i, i + 2), 16)
 			}
 
-			function minmax($min, $max, minDef = Number.MIN_SAFE_INTEGER, maxDef = Number.MAX_SAFE_INTEGER) {
+			function minmax($min, $max, minDef = Number.MIN_SAFE_INTEGER, maxDef = Number.MAX_SAFE_INTEGER, clamp = true) {
         return {
           min:
             $min !== undefined
-              ? Math.max(Number($min), minDef)
+              ? clamp ? Math.max(Number($min), minDef) : Number($min)
               : minDef,
           max:
             $max !== undefined
-              ? Math.min(Number($max), maxDef)
+              ? clamp ? Math.min(Number($max), maxDef) : Number($max)
               : maxDef,
         }
       }
@@ -69,7 +69,7 @@
       const processors = {
         number: {
           bytesLength: () => 8,
-          deserialize: (input) => new Float64Array(new BigUint64Array([BigInt(`0x${input}`)]).buffer)[0],
+          deserialize: (input) => new Float64Array(new BigUint64Array([BigInt("0x" + input)]).buffer)[0],
           constrain: (value, { options }) => {
 						const { min, max } = minmax(options?.min, options?.max)
 						return Math.min(Math.max(value, min), max)
@@ -142,13 +142,13 @@
         },
         string: {
           bytesLength: (options) => options?.maxLength !== undefined ? Number(options.maxLength) : 64,
-          deserialize: (input) => {
-						const buf = new Uint8Array(asBytes(input, 64))
+          deserialize: (input, { options }) => {
+						const buf = new Uint8Array(asBytes(input, processors.string.bytesLength(options)))
 						const idx = buf.indexOf(0)
-						return new TextDecoder().decode(idx !== -1 ? buf.slice(0, idx) : buf)
+						return new TextDecoder().decode(idx !== -1 ? buf.subarray(0, idx) : buf)
 					},
           constrain: (value, { options }) => {
-						const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64)
+						const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
 						return value.length > max
 							? value.slice(0, max)
 							: value.length < min
@@ -156,7 +156,7 @@
 							: value
 					},
           random: ({ options }) => {
-						const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64)
+						const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
 						const length = Math.round(Math.random() * (max - min) + min)
 						return [...Array(length)].map(() => (~~(Math.random() * 36)).toString(36)).join("")
 					},
