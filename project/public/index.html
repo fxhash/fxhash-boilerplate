@@ -253,24 +253,19 @@
             2,
           )
         }
-        
       }
-      window.addEventListener("message", (event) => {
-        if (event.data === "fxhash_getHash") {
+      window.addEventListener("message", ({data}) => {
+        if (data === "fxhash_getHash") {
           parent.postMessage({
             id: "fxhash_getHash",
             data: window.$fx.hash
           }, "*")
-        }
-        
-        if (event.data === "fxhash_getFeatures") {
+        } else if (data === "fxhash_getFeatures") {
           parent.postMessage({
             id: "fxhash_getFeatures",
             data: window.$fx.getFeatures()
           }, "*")
-        }
-
-        if (event.data === "fxhash_getParams") {
+        } else if (data === "fxhash_getParams") {
           parent.postMessage({
             id: "fxhash_getParams",
             data: {
