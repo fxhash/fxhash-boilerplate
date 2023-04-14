@@ -7,10 +7,10 @@
       //---- do not edit the following code (you can indent as you wish)
       let search = new URLSearchParams(window.location.search)
       let alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
-      var fxhash = search.get('fxhash') || "oo" + Array(49).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join('')
+      var fxhash = search.get("fxhash") || "oo" + Array(49).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join("")
       let b58dec = str=>[...str].reduce((p,c)=>p*alphabet.length+alphabet.indexOf(c)|0, 0)
       let fxhashTrunc = fxhash.slice(2)
-      let regex = new RegExp(".{" + ((fxhash.length/4)|0) + "}", 'g')
+      let regex = new RegExp(".{" + ((fxhash.length/4)|0) + "}", "g")
       let hashes = fxhashTrunc.match(regex).map(h => b58dec(h))
       let sfc32 = (a, b, c, d) => {
         return () => {
@@ -27,7 +27,7 @@
       var fxrand = sfc32(...hashes)
       // true if preview mode active, false otherwise
       // you can append preview=1 to the URL to simulate preview active
-      var isFxpreview = search.get('preview') === "1"
+      var isFxpreview = search.get("preview") === "1"
       // call this method to trigger the preview
       function fxpreview() {
         window.dispatchEvent(new Event("fxhash-preview"))
@@ -37,7 +37,7 @@
       // NEW: v2 of the fxhash SDK lol
       //
       // get the byte params from the URL
-      let fxparams = search.get('fxparams')
+      let fxparams = search.get("fxparams")
       fxparams = fxparams ? fxparams.replace("0x", "") : fxparams
 
       function* asBytes(hex, n) {
@@ -177,7 +177,7 @@
             let v
             if (typeof def.default === "undefined") v = processor.random(def)
             else v = def.default
-            params[def.id] = processor.constrain?.(v, def) || v;
+            params[def.id] = processor.constrain?.(v, def) || v
             continue
           }
           // extract the length from the bytes & shift the initial bytes string
@@ -185,7 +185,7 @@
           bytes = bytes.substring(processor.bytesLength() * 2)
           // deserialize the bytes into the params
           const value =  processor.deserialize(valueBytes, def)
-          params[def.id] = processor.constrain?.(value, def) || value;
+          params[def.id] = processor.constrain?.(value, def) || value
         }
         return params
       }
@@ -196,9 +196,9 @@
           const processor = processors[def.type]
           const value = values[def.id]
           // deserialize the bytes into the params
-          paramValues[def.id] = processor.transform ? processor.transform(value) : value;
+          paramValues[def.id] = processor.transform ? processor.transform(value) : value
         }
-        return paramValues; 
+        return paramValues 
       }
 
       window.$fx = {
