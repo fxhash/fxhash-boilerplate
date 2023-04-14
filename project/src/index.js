@@ -17,6 +17,7 @@ $fx.params([
       step: 0.00000000000001,
     },
   },
+  
   {
     id: "bigint_id",
     name: "A bigint",
@@ -27,6 +28,16 @@ $fx.params([
       max: Number.MAX_SAFE_INTEGER * 4,
       step: 1,
     },
+  },
+  {
+    id: "string_id_long",
+    name: "A string long",
+    type: "string",
+    //default: "hello",
+    options: {
+      minLength: 1,
+      maxLength: 512
+    }
   },
   {
     id: "select_id",
@@ -56,7 +67,7 @@ $fx.params([
     //default: "hello",
     options: {
       minLength: 1,
-      maxLength: 64
+      maxLength: 512
     }
   },
 ]);
