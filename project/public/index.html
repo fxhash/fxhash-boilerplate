@@ -11,8 +11,8 @@
       // make fxrand from hash
       var fxhash = search.get("fxhash") || "oo" + Array(49).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join("")
       let fxhashTrunc = fxhash.slice(2)
-      let regex = new RegExp(".{" + ((fxhash.length/4)|0) + "}", "g")
-      let hashes = fxhashTrunc.match(regex).map(h => b58dec(h))
+      let regex = new RegExp(".{" + (fxhash.length >> 2) + "}", "g")
+      let hashes = fxhashTrunc.match(regex).map(b58dec)
       let sfc32 = (a, b, c, d) => {
         return () => {
           a |= 0; b |= 0; c |= 0; d |= 0
@@ -29,7 +29,7 @@
       // make fxrandminter from minter address
       var fxminter = search.get("fxminter") || "tz1" + Array(33).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join("")
       let fxminterTrunc = fxminter.slice(3)
-      regex = new RegExp(".{" + ((fxminterTrunc.length/4)|0) + "}", "g")
+      regex = new RegExp(".{" + (fxminterTrunc.length >> 2) + "}", "g")
       hashes = fxminterTrunc.match(regex).map(h => b58dec(h))
       var fxrandminter = sfc32(...hashes)
 
