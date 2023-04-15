@@ -105,6 +105,9 @@ url: ${window.location.href}
 hash: ${$fx.hash}
 </p>
 <p>
+hash: ${$fx.minter}
+</p>
+<p>
 params:
 </p>
 <pre>
