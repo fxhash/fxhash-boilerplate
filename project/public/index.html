@@ -50,14 +50,8 @@
 
       function minmax($min, $max, minDef = Number.MIN_SAFE_INTEGER, maxDef = Number.MAX_SAFE_INTEGER, clamp = true) {
         return {
-          min:
-            $min !== undefined
-              ? clamp ? Math.max(Number($min), minDef) : Number($min)
-              : minDef,
-          max:
-            $max !== undefined
-              ? clamp ? Math.min(Number($max), maxDef) : Number($max)
-              : maxDef,
+          min: $min !== undefined ? clamp ? Math.max(Number($min), minDef) : Number($min) : minDef,
+          max: $max !== undefined ? clamp ? Math.min(Number($max), maxDef) : Number($max) : maxDef,
         }
       }
       
@@ -227,39 +221,16 @@
           this._rawValues = deserializeParams(fxparams, definition)
           this._paramValues = transformParamValues(this._rawValues, definition)
         },
-        features(features) {
-          this._features = features
-        },
-        getFeature(id) {
-          return this._features[id]
-        },
-        getFeatures() {
-          return this._features
-        },
-        getParam(id) {
-          return this._paramValues[id]
-        },
-        getParams() {
-          return this._paramValues
-        },
-        getRawParam(id) {
-          return this._rawValues[id]
-        },
-        getRawParams() {
-          return this._rawValues
-        },
-        getDefinitions() {
-          return this._params
-        },
+        features(features) { this._features = features },
+        getFeature(id) { return this._features[id] },
+        getFeatures() { return this._features },
+        getParam(id) { return this._paramValues[id] },
+        getParams() { return this._paramValues },
+        getRawParam(id) { return this._rawValues[id] },
+        getRawParams() { return this._rawValues },
+        getDefinitions() { return this._params },
         stringifyParams(params) {
-          return JSON.stringify(
-            params,
-            (key, value) => {
-              if (typeof value === "bigint") return value.toString()
-              return value
-            }, 
-            2,
-          )
+          return JSON.stringify(params, (_, v) => typeof v === "bigint" ? v.toString() : v,  2)
         }
       }
 
