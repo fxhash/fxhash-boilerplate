@@ -95,7 +95,7 @@
               random = BigInt(
                 "0x" +
                   Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8))))
-                    .map((x) => x < 10 ? "0" + x : x.toString(16))
+                    .map((x) => x < 16 ? "0" + x : x.toString(16))
                     .join("")
               )
             } while (random > range)
