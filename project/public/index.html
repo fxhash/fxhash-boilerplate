@@ -47,12 +47,12 @@
       fxparams = fxparams ? fxparams.replace("0x", "") : fxparams
 
       function* asBytes(hex, n) {
-				n *= 2
-				for (let i = 0; i < n; i += 2)
-					yield parseInt(hex.substring(i, i + 2), 16)
-			}
+        n *= 2
+        for (let i = 0; i < n; i += 2)
+          yield parseInt(hex.substring(i, i + 2), 16)
+      }
 
-			function minmax($min, $max, minDef = Number.MIN_SAFE_INTEGER, maxDef = Number.MAX_SAFE_INTEGER, clamp = true) {
+      function minmax($min, $max, minDef = Number.MIN_SAFE_INTEGER, maxDef = Number.MAX_SAFE_INTEGER, clamp = true) {
         return {
           min:
             $min !== undefined
@@ -71,46 +71,46 @@
           bytesLength: () => 8,
           deserialize: (input) => new Float64Array(new BigUint64Array([BigInt("0x" + input)]).buffer)[0],
           constrain: (value, { options }) => {
-						const { min, max } = minmax(options?.min, options?.max)
-						return Math.min(Math.max(value, min), max)
-					},
+            const { min, max } = minmax(options?.min, options?.max)
+            return Math.min(Math.max(value, min), max)
+          },
           random: ({ options }) => {
-						const { min, max } = minmax(options?.min, options?.max)
-						const v = Math.random() * (max - min) + min
-						if (options?.step) {
-							const t = 1.0 / options.step
-							return Math.round(v * t) / t
-						}
-						return v
-					},
+            const { min, max } = minmax(options?.min, options?.max)
+            const v = Math.random() * (max - min) + min
+            if (options?.step) {
+              const t = 1.0 / options.step
+              return Math.round(v * t) / t
+            }
+            return v
+          },
         },
         bigint: {
           bytesLength: () => 8,
           deserialize: (input) => BigInt.asIntN(64, BigInt("0x" + input)),
           random: ({ options }) => {
-						const MIN_SAFE_INT64 = -9223372036854775808n
-						const MAX_SAFE_INT64 = 9223372036854775807n
-						if (options?.min !== undefined) {
-							min = BigInt(options.min)
-							if (min < MIN_SAFE_INT64) min = MIN_SAFE_INT64
-						}
-						if (options?.max !== undefined) {
-							max = BigInt(options.max)
-							if (max > MAX_SAFE_INT64) max = MAX_SAFE_INT64
-						}
-						const range = max - min
-						const bits = range.toString(2).length
-						let random
-						do {
-							random = BigInt(
-								"0x" +
-									Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8))))
-										.map((x) => x < 10 ? "0" + x : x.toString(16))
-										.join("")
-							)
-						} while (random > range)
-						return random + min
-					},
+            const MIN_SAFE_INT64 = -9223372036854775808n
+            const MAX_SAFE_INT64 = 9223372036854775807n
+            if (options?.min !== undefined) {
+              min = BigInt(options.min)
+              if (min < MIN_SAFE_INT64) min = MIN_SAFE_INT64
+            }
+            if (options?.max !== undefined) {
+              max = BigInt(options.max)
+              if (max > MAX_SAFE_INT64) max = MAX_SAFE_INT64
+            }
+            const range = max - min
+            const bits = range.toString(2).length
+            let random
+            do {
+              random = BigInt(
+                "0x" +
+                  Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8))))
+                    .map((x) => x < 10 ? "0" + x : x.toString(16))
+                    .join("")
+              )
+            } while (random > range)
+            return random + min
+          },
         },
         boolean: {
           bytesLength: () => 1,
@@ -121,45 +121,45 @@
           bytesLength: () => 4,
           deserialize: (input) => input,
           transform: (input) => {
-						const [r, g, b, a] = asBytes(input, 4)
-						return {
-							hex: {
-								rgb: "#" + input.slice(0, 6),
-								rgba: "#" + input,
-							},
-							obj: {
-								rgb: { r, g, b },
-								rgba: { r, g, b, a },
-							},
-							arr: {
-								rgb: [r, g, b],
-								rgba: [r, g, b, a],
-							},
-						}
-					},
+            const [r, g, b, a] = asBytes(input, 4)
+            return {
+              hex: {
+                rgb: "#" + input.slice(0, 6),
+                rgba: "#" + input,
+              },
+              obj: {
+                rgb: { r, g, b },
+                rgba: { r, g, b, a },
+              },
+              arr: {
+                rgb: [r, g, b],
+                rgba: [r, g, b, a],
+              },
+            }
+          },
           constrain: (value) => value.replace("#", "").slice(0, 8).padEnd(8, "f"),
           random: () => ((Math.random() * 0x100000000) >>> 0).toString(16).padStart(8, "0"),
         },
         string: {
           bytesLength: (options) => options?.maxLength !== undefined ? Number(options.maxLength) : 64,
           deserialize: (input, { options }) => {
-						const buf = new Uint8Array(asBytes(input, processors.string.bytesLength(options)))
-						const idx = buf.indexOf(0)
-						return new TextDecoder().decode(idx !== -1 ? buf.subarray(0, idx) : buf)
-					},
+            const buf = new Uint8Array(asBytes(input, processors.string.bytesLength(options)))
+            const idx = buf.indexOf(0)
+            return new TextDecoder().decode(idx !== -1 ? buf.subarray(0, idx) : buf)
+          },
           constrain: (value, { options }) => {
-						const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
-						return value.length > max
-							? value.slice(0, max)
-							: value.length < min
-							? value.padEnd(min)
-							: value
-					},
+            const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
+            return value.length > max
+              ? value.slice(0, max)
+              : value.length < min
+              ? value.padEnd(min)
+              : value
+          },
           random: ({ options }) => {
-						const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
-						const length = Math.round(Math.random() * (max - min) + min)
-						return [...Array(length)].map(() => (~~(Math.random() * 36)).toString(36)).join("")
-					},
+            const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
+            const length = Math.round(Math.random() * (max - min) + min)
+            return [...Array(length)].map(() => (~~(Math.random() * 36)).toString(36)).join("")
+          },
         },
         select: {
           bytesLength: () => 1,
