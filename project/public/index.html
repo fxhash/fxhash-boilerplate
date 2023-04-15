@@ -8,11 +8,6 @@
       let search = new URLSearchParams(window.location.search)
       let alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
       let b58dec = str=>[...str].reduce((p,c)=>p*alphabet.length+alphabet.indexOf(c)|0, 0)
-      // make fxrand from hash
-      var fxhash = search.get("fxhash") || "oo" + Array(49).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join("")
-      let fxhashTrunc = fxhash.slice(2)
-      let regex = new RegExp(".{" + (fxhash.length >> 2) + "}", "g")
-      let hashes = fxhashTrunc.match(regex).map(b58dec)
       let sfc32 = (a, b, c, d) => {
         return () => {
           a |= 0; b |= 0; c |= 0; d |= 0
@@ -25,13 +20,14 @@
           return (t >>> 0) / 4294967296
         }
       }
-      var fxrand = sfc32(...hashes)
+      let rndHash = (n) => Array(n).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join("")
+      let matcher = (str, start) => str.slice(start).match(new RegExp(".{"+((str.length-start)>>2)+"}","g")).map(b58dec)
+      // make fxrand from hash
+      var fxhash = search.get("fxhash") || "oo" + rndHash(49)
+      var fxrand = sfc32(...matcher(fxhash, 2))
       // make fxrandminter from minter address
-      var fxminter = search.get("fxminter") || "tz1" + Array(33).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join("")
-      let fxminterTrunc = fxminter.slice(3)
-      regex = new RegExp(".{" + (fxminterTrunc.length >> 2) + "}", "g")
-      hashes = fxminterTrunc.match(regex).map(h => b58dec(h))
-      var fxrandminter = sfc32(...hashes)
+      var fxminter = search.get("fxminter") || "tz1" + rndHash(33)
+      var fxrandminter = sfc32(...matcher(fxminter, 3))
 
       // true if preview mode active, false otherwise
       // you can append preview=1 to the URL to simulate preview active
