@@ -34,7 +34,9 @@ The code snippet exposes the `$fx` object with the following structure:
 ```typescript
 {
   hash: String, // a random 64 characters hexadecimal string. This particular variable will be hardcoded with a static hash when someone mints a token from your GT
-  rand: () => Number, // a PRNG function that generates deterministic PRN between 0 and 1. Simply use it instead of Math.random().
+  rand: () => Number, // a PRNG function seeded with the hash, that generates deterministic PRN between 0 and 1
+  minter: String, // The string of the wallet address of the minter injected into the iteration
+  randminter: () => Number, // a PRNG function seeded with the minter address that generates deterministic PRN between 0 and 1
   preview: () => void, // trigger for capture module
   isPreview: Boolean, // is TRUE when capture module is running the project
   params: (definitions) => void, // sets your projects fx(params) definitions
