@@ -42,9 +42,14 @@
         // window.dispatchEvent(new Event("fxhash-preview"))
         // setTimeout(() => fxpreview(), 500)
       }
+
+      function getParamsFromSearch() {
+        const searchParams = search.get("fxparams")
+        return searchParams?.replace("0x", "") || searchParams;
+      }
+
       // get the byte params from the URL
-      let fxparams = search.get('fxparams')
-      fxparams = fxparams ? fxparams.replace("0x", "") : fxparams
+      let fxparams;
 
       // the parameter processor, used to parse fxparams
       const processors = {
@@ -261,12 +266,39 @@
       window.$fx = {
         _version: "3.0.0",
         _processors: processors,
+        _flags: {},
         // where params def & features will be stored
         _params: undefined,
         _features: undefined,
         // where the parameter values are stored
         _paramValues: {},
-
+        _listeners: {},
+        on: function(name, callback) {
+          if(!this._listeners[name]) {
+            this._listeners[name] = []
+          }
+          this._listeners[name].push(callback)
+          return function removeListener() {
+            const index = this._listeners[eventName].indexOf(callback);
+            if (index > -1) {
+              this._listeners[eventName].splice(index, 1);
+            }
+          };
+        },
+        call: async function(name, data) {
+          const results = [];
+          if (this._listeners && this._listeners[name]) {
+            for (const callback of this._listeners[name]) {
+              const result = callback(data);
+              if (result instanceof Promise) {
+                results.push(await result);
+              } else {
+                results.push(result);
+              }
+            }
+          }
+          return results;
+        },
         hash: fxhash,
         rand: fxrand,
 
@@ -275,12 +307,19 @@
 
         preview: fxpreview,
         isPreview: isFxpreview,
-        params: function(definition) {
+        params: function(definition, options={}) {
           // todo: maybe do some validation on the dev side ?
           // or maybe not ?
+          const { withLiveParams=false } = options;
+          fxparams = getParamsFromSearch()
+          this._flags.withLiveParams = withLiveParams
           this._params = definition
           this._rawValues = deserializeParams(fxparams, definition)
           this._paramValues = transformParamValues(this._rawValues, definition)
+        },
+        udpateParams: function(fxparams) {
+          this._rawValues = deserializeParams(fxparams, this._params)
+          this._paramValues = transformParamValues(this._rawValues, this._params)
         },
         features: function(features) {
           this._features = features
@@ -315,10 +354,13 @@
             }, 
             2,
           )
-        }
-        
+        },
+        sendParams: function() {
+          
+        },
       }
-      window.addEventListener("message", (event) => {
+
+      window.addEventListener("message", async (event) => {
         if (event.data === "fxhash_getInfo") {
           parent.postMessage({
             id: "fxhash_getInfo",
@@ -331,8 +373,17 @@
                 values: window.$fx.getRawParams(),
               },
               minter: window.$fx.minter,
+              flags: window.$fx._flags,
             },
           }, "*")
+        }
+        if (event.data?.id === "fxhash_update") {
+          const { bytes, value, id, paramId } = event.data
+          const handled = await $fx.call("paramsUpdate", { bytes, value, paramId })
+          // do default thing when handlers didn't handle
+          if (handled.some(handle => !!handle)) {
+            $fx.udpateParams(bytes)
+          }
         }
       })
       // END NEW
