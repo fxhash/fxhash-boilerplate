@@ -46,6 +46,8 @@
       let fxparams = search.get('fxparams')
       fxparams = fxparams ? fxparams.replace("0x", "") : fxparams
 
+      var fxiteration = search.get('fxiteration') || 0
+
       // the parameter processor, used to parse fxparams
       const processors = {
         number: {
@@ -272,6 +274,8 @@
 
         minter: fxminter,
         randminter: fxrandminter,
+
+        iteration: fxiteration,
 
         preview: fxpreview,
         isPreview: isFxpreview,
