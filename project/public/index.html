@@ -430,6 +430,15 @@
             }
           }, "*")
         },
+        _updateParams: function({ bytes, id, value }) {
+          const handlers = await $fx.call("paramsUpdate", { bytes, value, id })
+          handlers.forEach(([handled, onDone]) => {
+            if (!handled) {
+              $fx.updateParam(id, value)
+            }
+            onDone?.()
+          })
+        }
         _updateInputBytes: function() {
           const bytes = serializeParams(this._rawValues, this._params)
           const urlObject = new URL(window.location.href)
@@ -495,14 +504,7 @@
         }
         if (event.data?.id === "fxhash_update") {
           const { bytes, value, id } = event.data.data
-          if (!id) return
-          const handlers = await $fx.call("paramsUpdate", { bytes, value, id })
-          handlers.forEach(([handled, onDone]) => {
-            if (!handled) {
-              $fx.updateParam(id, value)
-            }
-            onDone?.()
-          })
+          if (id) $fx._updateParams({bytes, value, id })
         }
       })
       // END NEW

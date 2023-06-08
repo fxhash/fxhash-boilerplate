@@ -143,6 +143,9 @@ main()
 
 $fx.on(
   "paramsUpdate",
-  () => false,
+  ({ bytes, id, value }) => {
+    if (value === 5 && id === "number_id") return true
+    return false
+  },
   () => main()
 )
