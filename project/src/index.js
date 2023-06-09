@@ -134,7 +134,7 @@ main()
 $fx.on(
   "updateParams",
   (newRawValues) => {
-    if (newRawValues.number_id.value === 5) return true
+    if (newRawValues.number_id === 5) return true
     return false
   },
   () => main()
