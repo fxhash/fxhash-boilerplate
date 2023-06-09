@@ -480,15 +480,20 @@
           )
           this._updateInputBytes()
         },
-        _receiveParamsUpdate: async function ({ bytes, id, value }) {
-          const handlers = await this.call("updateParams", { bytes, value, id })
+        _receiveUpdateParams: async function ({ params }, onDefault) {
+          console.log(params)
+          const handlers = await this.call("updateParams", { params })
           handlers.forEach(([handled, onDone]) => {
             if (!handled) {
-              this._updateParam(id, value)
+              this._updateParams(params)
+              onDefault?.()
             }
             onDone?.()
           })
-          if (handlers.length === 0) this._updateParam(id, value)
+          if (handlers.length === 0) {
+            this._updateParams(params)
+            onDefault?.()
+          }
         },
         _updateInputBytes: function () {
           const bytes = serializeParams(this._rawValues, this._params)
@@ -541,26 +546,30 @@
               break
           }
         },
-        _emitParams: function (rawValues) {
-          this._updateParams(rawValues)
-          const constrained = Object.keys(rawValues).reduce((acc, paramId) => {
-            acc[paramId] = processParam(
-              paramId,
-              rawValues[paramId],
-              this._params,
-              "constrain"
-            )
-            return acc
-          }, {})
-          parent.postMessage(
-            {
-              id: "fxhash_emitParams",
-              data: {
-                params: constrained,
+        _emitParams: function (params) {
+          this._receiveUpdateParams({ params }, () => {
+            const constrained = Object.keys(params).reduce(
+              (acc, paramId) => {
+                acc[paramId] = processParam(
+                  paramId,
+                  params[paramId],
+                  this._params,
+                  "constrain"
+                )
+                return acc
               },
-            },
-            "*"
-          )
+              {}
+            )
+            parent.postMessage(
+              {
+                id: "fxhash_emitParams",
+                data: {
+                  params: constrained,
+                },
+              },
+              "*"
+            )
+          })
         },
       }
 
@@ -585,8 +594,8 @@
           )
         }
         if (event.data?.id === "fxhash_updateParams") {
-          const { bytes, value, id } = event.data.data
-          if (id) window.$fx._receiveParamsUpdate({ bytes, value, id })
+          const { params } = event.data.data
+          if (params) window.$fx._receiveUpdateParams({ params })
         }
       })
       // END NEW
