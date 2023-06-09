@@ -327,31 +327,33 @@
         },
       }
 
+      // Utility function to get parameter value, default value, or a random value
+      function getParamValue(param, def, processor) {
+        if (typeof param !== "undefined") return param
+        if (typeof def.default !== "undefined") return def.default
+        return processor.random(def)
+      }
+
       // params are injected into the piece using the binary representation of the
       // numbers, to keep precision
       function serializeParams(params, definition) {
-        // a single hex string will be used for all the params
-        let bytes = ""
-        if (!definition) return bytes
-        // loop through each parameter from the definition to find the associated
-        // parameter as set on the UI
+        // Initialization of the hex string for parameters
+        let hexString = ""
+        // If definition is not provided, return an empty hex string
+        if (!definition) return hexString
+        // Iterating over the definitions
         for (const def of definition) {
           const { id, type } = def
+          // Get the processor for the given type
           const processor = processors[type]
-          // if the param is definined in the object
-
-          const v = params[id]
-          const val =
-            typeof v !== "undefined"
-              ? v
-              : typeof def.default !== "undefined"
-              ? def.default
-              : processor.random(def)
-          const serialized = processor.serialize(val, def)
-          bytes += serialized
+          // Get the param value, fall back to default or a random value
+          const paramValue = getParamValue(params[id], def, processor)
+          // Serialize the param value
+          const serializedParam = processor.serialize(paramValue, def)
+          // Concatenate serialized params
+          hexString += serializedParam
         }
-
-        return bytes
+        return hexString
       }
 
       // takes the parameters as bytes and outputs an object with the
