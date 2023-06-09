@@ -195,17 +195,11 @@
           },
         },
         boolean: {
-          serialize: (input) => {
-            return typeof input === "boolean"
-              ? input
-                ? "01"
-                : "00"
-              : typeof input === "string"
-              ? input === "true"
-                ? "01"
-                : "00"
-              : "00"
-          },
+          serialize: (input) =>
+            (typeof input === "boolean" && input) ||
+            (typeof input === "string" && input === "true")
+              ? "01"
+              : "00",
           // if value is "00" -> 0 -> false, otherwise we consider it's 1
           deserialize: (input) => {
             return input === "00" ? false : true
