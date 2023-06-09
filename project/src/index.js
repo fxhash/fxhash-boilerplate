@@ -11,11 +11,11 @@ $fx.params([
     name: "A number/float64",
     type: "number",
     //default: Math.PI,
-    isLive: true,
+    update: "sync",
     options: {
       min: 1,
       max: 10,
-      step: 0.00000000000001,
+      step: 0.0001,
     },
   },
 
@@ -53,7 +53,7 @@ $fx.params([
     id: "color_id",
     name: "A color",
     type: "color",
-    isLive: true,
+    update: "sync",
     //default: "ff0000",
   },
   {
@@ -111,9 +111,6 @@ function main() {
   document.body.innerHTML = `
   <div style="color: ${textcolor};">
     <p>
-    url: ${window.location.href}
-    </p>
-    <p>
     hash: ${$fx.hash}
     </p>
     <p>
@@ -133,7 +130,7 @@ function main() {
   const btn = document.createElement("button")
   btn.textContent = "Sync number_id"
   btn.addEventListener("click", () => {
-    $fx.syncParam("number_id", Math.random() * 9 + 1)
+    $fx.syncParams({ number_id: Math.random() * 9 + 1 })
     main()
   })
   document.body.appendChild(btn)
