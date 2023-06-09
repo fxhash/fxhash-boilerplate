@@ -535,7 +535,17 @@
             2
           )
         },
-        syncParams: function (rawValues) {
+        emit: function (id, data) {
+          switch (id) {
+            case "params":
+              this._emitParams(data)
+              break
+            default:
+              console.log("$fx.emit called with unknown id:", id)
+              break
+          }
+        },
+        _emitParams: function (rawValues) {
           this._updateParams(rawValues)
           const constrained = Object.keys(rawValues).reduce((acc, paramId) => {
             acc[paramId] = processParam(
@@ -548,7 +558,7 @@
           }, {})
           parent.postMessage(
             {
-              id: "fxhash_syncParams",
+              id: "fxhash_emitParams",
               data: {
                 params: constrained,
               },

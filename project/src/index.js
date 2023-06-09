@@ -130,7 +130,7 @@ function main() {
   const btn = document.createElement("button")
   btn.textContent = "Sync number_id"
   btn.addEventListener("click", () => {
-    $fx.syncParams({ number_id: Math.random() * 9 + 1 })
+    $fx.emit("params", { number_id: Math.random() * 9 + 1 })
     main()
   })
   document.body.appendChild(btn)
