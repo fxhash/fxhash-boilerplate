@@ -481,7 +481,7 @@
           this._updateInputBytes()
         },
         _receiveParamsUpdate: async function ({ bytes, id, value }) {
-          const handlers = await this.call("paramsUpdate", { bytes, value, id })
+          const handlers = await this.call("updateParams", { bytes, value, id })
           handlers.forEach(([handled, onDone]) => {
             if (!handled) {
               this._updateParam(id, value)
@@ -533,7 +533,7 @@
         },
         emit: function (id, data) {
           switch (id) {
-            case "params":
+            case "updateParams":
               this._emitParams(data)
               break
             default:

@@ -130,7 +130,7 @@ function main() {
   const btn = document.createElement("button")
   btn.textContent = "Sync number_id"
   btn.addEventListener("click", () => {
-    $fx.emit("params", { number_id: Math.random() * 9 + 1 })
+    $fx.emit("updateParams", { number_id: Math.random() * 9 + 1 })
     main()
   })
   document.body.appendChild(btn)
@@ -139,7 +139,7 @@ function main() {
 main()
 
 $fx.on(
-  "paramsUpdate",
+  "updateParams",
   ({ bytes, id, value }) => {
     if (value === 5 && id === "number_id") return true
     return false
