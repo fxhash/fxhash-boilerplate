@@ -120,6 +120,9 @@ function main() {
     inputBytes: ${$fx.inputBytes}
     </p>
     <p>
+    context: ${$fx.context}
+    </p>
+    <p>
     params:
     </p>
     <pre>
