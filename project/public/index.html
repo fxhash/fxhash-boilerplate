@@ -422,6 +422,31 @@
           url.searchParams.set("fxparams", `0x${bytes}`)
           _updateUrl(url)
         },
+        _emitParams: function (newRawValues) {
+          this._receiveUpdateParams(newRawValues, () => {
+            const constrained = Object.keys(newRawValues).reduce(
+              (acc, paramId) => {
+                acc[paramId] = processParam(
+                  paramId,
+                  newRawValues[paramId],
+                  this._params,
+                  "constrain"
+                )
+                return acc
+              },
+              {}
+            )
+            parent.postMessage(
+              {
+                id: "fxhash_emitParams",
+                data: {
+                  params: constrained,
+                },
+              },
+              "*"
+            )
+          })
+        },
         hash: fxhash,
         rand: fxrand,
 
@@ -501,6 +526,16 @@
             }
           }
           return results
+        },
+        emit: function (id, data) {
+          switch (id) {
+            case "updateParams":
+              this._emitParams(data)
+              break
+            default:
+              console.log("$fx.emit called with unknown id:", id)
+              break
+          }
         },
       }
       window.addEventListener("message", (event) => {
