@@ -383,7 +383,7 @@
         _paramValues: {},
         _listeners: {},
         _receiveUpdateParams: async function (newRawValues, onDefault) {
-          const handlers = await this.call("updateParams", newRawValues)
+          const handlers = await this.call("params:update", newRawValues)
           handlers.forEach(([handled, onDone]) => {
             if (!handled) {
               this._updateParams(newRawValues)
@@ -517,7 +517,7 @@
             },
           }, "*")
         }
-        if (event.data?.id === "fxhash_updateParams") {
+        if (event.data?.id === "params:update") {
           const { params } = event.data.data
           if (params) window.$fx._receiveUpdateParams(params)
         }
