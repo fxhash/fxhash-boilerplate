@@ -490,7 +490,7 @@
         },
         call: async function (name, data) {
           const results = []
-          if (this._listeners && this._listeners[name]) {
+          if (this._listeners?.[name]) {
             for (const [callback, onDone] of this._listeners[name]) {
               const result = callback(data)
               if (result instanceof Promise) {
