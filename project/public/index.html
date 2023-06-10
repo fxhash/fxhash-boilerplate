@@ -32,8 +32,6 @@
       regex = new RegExp(".{" + ((fxminterTrunc.length/4)|0) + "}", 'g')
       hashes = fxminterTrunc.match(regex).map(h => b58dec(h))
       var fxrandminter = sfc32(...hashes)
-
-      var fxcontext = search.get("fxcontext") || "standalone"
       // true if preview mode active, false otherwise
       // you can append preview=1 to the URL to simulate preview active
       var isFxpreview = search.get('preview') === "1"
@@ -429,7 +427,7 @@
         minter: fxminter,
         randminter: fxrandminter,
 
-        context: fxcontext,
+        context: search.get("fxcontext") || "standalone",
         preview: fxpreview,
         isPreview: isFxpreview,
         params: function(definition) {
