@@ -135,11 +135,10 @@ function main() {
 main()
 
 $fx.on(
-  "updateParams",
+  "params:update",
   (newRawValues) => {
     if (newRawValues.number_id === 5) return true
     return false
   },
   () => main()
 )
-
