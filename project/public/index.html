@@ -299,7 +299,7 @@
       }
 
       // Utility function to get parameter value, default value, or a random value
-      function getParamValue(param, def, processor) {
+      const getParamValue = (param, def, processor) => {
         if (typeof param !== "undefined") return param
         if (typeof def.default !== "undefined") return def.default
         return processor.random(def)
@@ -307,7 +307,7 @@
 
       // params are injected into the piece using the binary representation of the
       // numbers, to keep precision
-      function serializeParams(params, definition) {
+      const serializeParams = (params, definition) => {
         // Initialization of the hex string for parameters
         let hexString = ""
         // If definition is not provided, return an empty hex string
