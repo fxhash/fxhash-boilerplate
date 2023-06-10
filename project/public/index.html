@@ -517,7 +517,7 @@
             },
           }, "*")
         }
-        if (event.data?.id === "params:update") {
+        if (event.data?.id === "fxhash_params:update") {
           const { params } = event.data.data
           if (params) window.$fx._receiveUpdateParams(params)
         }
