@@ -66,7 +66,7 @@
         window.history.pushState({ path: url.href }, "", url.href)
       }, 300)
 
-      const stringToHex = function (s) {
+      const stringToHex = (s) => {
         let rtn = ""
         for (let i = 0; i < s.length; i++) {
           rtn += s.charCodeAt(i).toString(16).padStart(4, "0")
@@ -74,7 +74,7 @@
         return rtn
       }
 
-      function completeHexColor(hexCode) {
+      const completeHexColor = (hexCode) => {
         let hex = hexCode.replace("#", "")
         if (hex.length === 6) {
           hex = `${hex}ff`
