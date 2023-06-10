@@ -60,10 +60,6 @@
         }
       }
 
-      const _updateUrl = throttle((url) => {
-        window.history.pushState({ path: url.href }, "", url.href)
-      }, 300)
-
       const stringToHex = (s) => {
         let rtn = ""
         for (let i = 0; i < s.length; i++) {
@@ -415,9 +411,6 @@
         _updateInputBytes: function () {
           const bytes = serializeParams(this._rawValues, this._params)
           this.inputBytes = bytes
-          const url = new URL(window.location.href)
-          url.searchParams.set("fxparams", `0x${bytes}`)
-          _updateUrl(url)
         },
         hash: fxhash,
         rand: fxrand,
