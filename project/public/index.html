@@ -45,24 +45,22 @@
       // get the byte params from the URL
       const searchParams = search.get("fxparams")
       let initialInputBytes = searchParams?.replace("0x", "")
-      const debounce = (func, delay) => {
-        let t
-        let isFirstCall = true
+      const throttle = (func, delay) => {
+        let isThrottled = false
+
         return function (...args) {
-          const c = this
-          if (isFirstCall) {
-            func.apply(c, args)
-            isFirstCall = false
-          } else {
-            clearTimeout(t)
-            t = setTimeout(() => {
-              func.apply(c, args)
+          if (!isThrottled) {
+            func.apply(this, args)
+            isThrottled = true
+            
+            setTimeout(() => {
+              isThrottled = false
             }, delay)
           }
         }
       }
 
-      const _updateUrl = debounce((url) => {
+      const _updateUrl = throttle((url) => {
         window.history.pushState({ path: url.href }, "", url.href)
       }, 300)
 
@@ -462,7 +460,7 @@
           return this._rawValues
         },
         getDefinitions: function() {
-          return this._params;
+          return this._params
         },
         stringifyParams: function(params) {
           return JSON.stringify(
