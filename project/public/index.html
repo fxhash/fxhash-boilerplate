@@ -479,12 +479,12 @@
             this._listeners[name] = []
           }
           this._listeners[name].push([callback, onDone])
-          return function removeListener() {
-            const index = this._listeners[eventName].findIndex(
+          return () => {
+            const index = this._listeners[name].findIndex(
               ([c]) => c === callback
             )
             if (index > -1) {
-              this._listeners[eventName].splice(index, 1)
+              this._listeners[name].splice(index, 1)
             }
           }
         },
