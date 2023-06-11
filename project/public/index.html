@@ -42,7 +42,6 @@
         // setTimeout(() => fxpreview(), 500)
       }
       // get the byte params from the URL
-      // get the byte params from the URL
       const searchParams = search.get("fxparams")
       let initialInputBytes = searchParams?.replace("0x", "")
       const throttle = (func, delay) => {
@@ -370,7 +369,7 @@
       }
 
       window.$fx = {
-        _version: "3.0.0",
+        _version: "3.1.0",
         _processors: processors,
         // where params def & features will be stored
         _params: undefined,
