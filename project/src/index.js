@@ -137,8 +137,10 @@ main()
 $fx.on(
   "params:update",
   (newRawValues) => {
-    if (newRawValues.number_id === 5) return true
-    return false
+    // opt-out default behaviour
+    if (newRawValues.number_id === 5) return false
+    // opt-in default behaviour
+    return true
   },
-  () => main()
+  (optInDefault, newValues) => main()
 )
