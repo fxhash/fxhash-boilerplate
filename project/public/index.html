@@ -28,9 +28,10 @@
       // make fxrandminter from minter address
       var fxminter = search.get("fxminter") || "tz1" + rndHash(33)
       var fxrandminter = sfc32(...matcher(fxminter, 3))
+
       // true if preview mode active, false otherwise
       // you can append preview=1 to the URL to simulate preview active
-      var isFxpreview = search.get('preview') === "1"
+      var isFxpreview = search.get("preview") === "1"
       // call this method to trigger the preview
       function fxpreview() {
         console.log("FXPREVIEW")
@@ -38,8 +39,8 @@
         // setTimeout(() => fxpreview(), 500)
       }
       // get the byte params from the URL
-      const searchParams = search.get("fxparams")
-      let initialInputBytes = searchParams?.replace("0x", "")
+      const fxparams = search.get("fxparams")
+      let initialInputBytes = fxparams?.replace("0x", "")
       const throttle = (func, delay) => {
         let isThrottled = false
 
@@ -74,6 +75,19 @@
         return hex
       }
 
+      function* asBytes(hex, n) {
+        n *= 2
+        for (let i = 0; i < n; i += 2)
+          yield parseInt(hex.substring(i, i + 2), 16)
+      }
+
+      function minmax($min, $max, minDef = Number.MIN_SAFE_INTEGER, maxDef = Number.MAX_SAFE_INTEGER, clamp = true) {
+        return {
+          min: $min !== undefined ? clamp ? Math.max(Number($min), minDef) : Number($min) : minDef,
+          max: $max !== undefined ? clamp ? Math.min(Number($max), maxDef) : Number($max) : maxDef,
+        }
+      }
+      
       // the parameter processor, used to parse fxparams
       const processors = {
         number: {
@@ -82,42 +96,17 @@
             view.setFloat64(0, input)
             return view.getBigUint64(0).toString(16).padStart(16, "0")
           },
-          deserialize: (input) => {
-            const view = new DataView(new ArrayBuffer(8))
-            for (let i = 0; i < 8; i++) {
-              view.setUint8(i, parseInt(input.substring(i * 2, i * 2 + 2), 16))
-            }
-            return view.getFloat64(0)
-          },
+          deserialize: (input) => new Float64Array(new BigUint64Array([BigInt("0x" + input)]).buffer)[0],
           bytesLength: () => 8,
-          constrain: (value, definition) => {
-            let min = Number.MIN_SAFE_INTEGER
-            if (typeof definition.options?.min !== "undefined")
-              min = Number(definition.options.min)
-            let max = Number.MAX_SAFE_INTEGER
-            if (typeof definition.options?.max !== "undefined")
-              max = Number(definition.options.max)
-            max = Math.min(max, Number.MAX_SAFE_INTEGER)
-            min = Math.max(min, Number.MIN_SAFE_INTEGER)
-            const v = Math.min(Math.max(value, min), max)
-            if (definition?.options?.step) {
-              const t = 1.0 / definition?.options?.step
-              return Math.round(v * t) / t
-            }
-            return v
+          constrain: (value, { options }) => {
+            const { min, max } = minmax(options?.min, options?.max)
+            return Math.min(Math.max(value, min), max)
           },
-          random: (definition) => {
-            let min = Number.MIN_SAFE_INTEGER
-            if (typeof definition.options?.min !== "undefined")
-              min = Number(definition.options.min)
-            let max = Number.MAX_SAFE_INTEGER
-            if (typeof definition.options?.max !== "undefined")
-              max = Number(definition.options.max)
-            max = Math.min(max, Number.MAX_SAFE_INTEGER)
-            min = Math.max(min, Number.MIN_SAFE_INTEGER)
+          random: ({ options }) => {
+            const { min, max } = minmax(options?.min, options?.max)
             const v = Math.random() * (max - min) + min
-            if (definition?.options?.step) {
-              const t = 1.0 / definition?.options?.step
+            if (options?.step) {
+              const t = 1.0 / options.step
               return Math.round(v * t) / t
             }
             return v
@@ -129,33 +118,27 @@
             view.setBigInt64(0, BigInt(input))
             return view.getBigUint64(0).toString(16).padStart(16, "0")
           },
-          deserialize: (input) => {
-            const view = new DataView(new ArrayBuffer(8))
-            for (let i = 0; i < 8; i++) {
-              view.setUint8(i, parseInt(input.substring(i * 2, i * 2 + 2), 16))
-            }
-            return view.getBigInt64(0)
-          },
+          deserialize: (input) => BigInt.asIntN(64, BigInt("0x" + input)),
           bytesLength: () => 8,
-          random: (definition) => {
+          random: ({ options }) => {
             const MIN_SAFE_INT64 = -9223372036854775808n
             const MAX_SAFE_INT64 = 9223372036854775807n
-            let min = MIN_SAFE_INT64
-            let max = MAX_SAFE_INT64
-            if (typeof definition.options?.min !== "undefined")
-              min = BigInt(definition.options.min)
-            if (typeof definition.options?.max !== "undefined")
-              max = BigInt(definition.options.max)
+            if (options?.min !== undefined) {
+              min = BigInt(options.min)
+              if (min < MIN_SAFE_INT64) min = MIN_SAFE_INT64
+            }
+            if (options?.max !== undefined) {
+              max = BigInt(options.max)
+              if (max > MAX_SAFE_INT64) max = MAX_SAFE_INT64
+            }
             const range = max - min
             const bits = range.toString(2).length
             let random
             do {
               random = BigInt(
-                "0b" +
-                  Array.from(
-                    crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8)))
-                  )
-                    .map((b) => b.toString(2).padStart(8, "0"))
+                "0x" +
+                  Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8))))
+                    .map((x) => x.toString(16).padStart(2,"0"))
                     .join("")
               )
             } while (random > range)
@@ -169,23 +152,18 @@
               ? "01"
               : "00",
           // if value is "00" -> 0 -> false, otherwise we consider it's 1
-          deserialize: (input) => {
-            return input === "00" ? false : true
-          },
           bytesLength: () => 1,
+          deserialize: (input) => input !== "00",
           random: () => Math.random() < 0.5,
         },
         color: {
           serialize: (input) => {
             return completeHexColor(input)
           },
-          deserialize: (input) => input,
           bytesLength: () => 4,
+          deserialize: (input) => input,
           transform: (input) => {
-            const r = parseInt(input.slice(0, 2), 16)
-            const g = parseInt(input.slice(2, 4), 16)
-            const b = parseInt(input.slice(4, 6), 16)
-            const a = parseInt(input.slice(6, 8), 16)
+            const [r, g, b, a] = asBytes(input, 4)
             return {
               hex: {
                 rgb: "#" + input.slice(0, 6),
@@ -201,14 +179,8 @@
               },
             }
           },
-          constrain: (value, definition) => {
-            const hex = value.replace("#", "")
-            return hex.slice(0, 8).padEnd(8, "f")
-          },
-          random: () =>
-            `${[...Array(8)]
-              .map(() => Math.floor(Math.random() * 16).toString(16))
-              .join("")}`,
+          constrain: (value) => value.replace("#", "").slice(0, 8).padEnd(8, "f"),
+          random: () => ((Math.random() * 0x100000000) >>> 0).toString(16).padStart(8, "0"),
         },
         string: {
           serialize: (input, def) => {
@@ -219,45 +191,24 @@
             hex = hex.padEnd(max * 4, "0")
             return hex
           },
-          deserialize: (input) => {
-            const hx = input.match(/.{1,4}/g) || []
-            let rtn = ""
-            for (let i = 0; i < hx.length; i++) {
-              const int = parseInt(hx[i], 16)
-              if (int === 0) break
-              rtn += String.fromCharCode(int)
-            }
-            return rtn
+          deserialize: (input, { options }) => {
+            const buf = new Uint8Array(asBytes(input, processors.string.bytesLength(options)))
+            const idx = buf.indexOf(0)
+            return new TextDecoder().decode(idx !== -1 ? buf.subarray(0, idx) : buf)
           },
-          bytesLength: (options) => {
-            if (typeof options?.maxLength !== "undefined")
-              return Number(options.maxLength) * 2
-            return 64 * 2
+          bytesLength: (options) => options?.maxLength !== undefined ? Number(options.maxLength) : 64,
+          constrain: (value, { options }) => {
+            const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
+            return value.length > max
+              ? value.slice(0, max)
+              : value.length < min
+              ? value.padEnd(min)
+              : value
           },
-          constrain: (value, definition) => {
-            let min = 0
-            if (typeof definition.options?.minLength !== "undefined")
-              min = definition.options.minLength
-            let max = 64
-            if (typeof definition.options?.maxLength !== "undefined")
-              max = definition.options.maxLength
-            let v = value.slice(0, max)
-            if (v.length < min) {
-              return v.padEnd(min)
-            }
-            return v
-          },
-          random: (definition) => {
-            let min = 0
-            if (typeof definition.options?.minLength !== "undefined")
-              min = definition.options.minLength
-            let max = 64
-            if (typeof definition.options?.maxLength !== "undefined")
-              max = definition.options.maxLength
+          random: ({ options }) => {
+            const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
             const length = Math.round(Math.random() * (max - min) + min)
-            return [...Array(length)]
-              .map((i) => (~~(Math.random() * 36)).toString(36))
-              .join("")
+            return [...Array(length)].map(() => (~~(Math.random() * 36)).toString(36)).join("")
           },
         },
         select: {
@@ -267,25 +218,12 @@
               .toString(16)
               .padStart(2, "0")
           },
-          deserialize: (input, definition) => {
-            return (
-              definition.options.options[parseInt(input, 16)] ||
-              definition.default
-            )
-          },
           bytesLength: () => 1,
-          constrain: (value, definition) => {
-            if (definition.options.options.includes(value)) {
-              return value
-            }
-            return definition.options.options[0]
-          },
-          random: (definition) => {
-            const index = Math.round(
-              Math.random() * (definition?.options?.options?.length - 1) + 0
-            )
-            return definition?.options?.options[index]
-          },
+          deserialize: (input, def) => def.options.options[parseInt(input, 16)] || def.default,
+          constrain: (value, { options }) => options.options.includes(value)
+            ? value
+            : options.options[0],
+          random: ({ options }) => options.options[~~(Math.random() * options.options.length)],
         },
       }
 
@@ -320,27 +258,23 @@
 
       // takes the parameters as bytes and outputs an object with the
       // deserialized parameters, identified by their id in an object
-      const deserializeParams = (bytes, definition) => {
+      const deserializeParams = (bytes, definitions) => {
         const params = {}
-        for (const def of definition) {
+        for (const def of definitions) {
           const processor = processors[def.type]
-          // if we don't have any parameters defined in the URL, set the
+          // if we don't have any parameters defined in the URL, set the 
           // default value and move on
           if (!bytes) {
-            let v
-            if (typeof def.default === "undefined") v = processor.random(def)
-            else v = def.default
+            const v = def.default === undefined ? processor.random(def) : def.default
             params[def.id] = processor.constrain?.(v, def) || v
             continue
           }
           // extract the length from the bytes & shift the initial bytes string
-          const valueBytes = bytes.substring(
-            0,
-            processor.bytesLength(def?.options) * 2
-          )
-          bytes = bytes.substring(processor.bytesLength(def?.options) * 2)
+          const len = processor.bytesLength(def?.options) * 2;
+          const valueBytes = bytes.substring(0, len)
+          bytes = bytes.substring(len)
           // deserialize the bytes into the params
-          const value = processor.deserialize(valueBytes, def)
+          const value =  processor.deserialize(valueBytes, def)
           params[def.id] = processor.constrain?.(value, def) || value
         }
         return params
@@ -365,7 +299,7 @@
       }
 
       window.$fx = {
-        _version: "3.1.0",
+        _version: "3.2.0",
         _processors: processors,
         // where params def & features will be stored
         _params: undefined,
@@ -453,6 +387,8 @@
         preview: fxpreview,
         isPreview: isFxpreview,
         params: function(definition) {
+          // todo: maybe do some validation on the dev side ?
+          // or maybe not ?
           this._params = definition
           this._rawValues = deserializeParams(initialInputBytes, definition)
           this._paramValues = processParams(
@@ -496,7 +432,7 @@
             2,
           )
         },
-        on: function (name, callback, onDone) {
+        on: function(name, callback, onDone) {
           if (!this._listeners[name]) {
             this._listeners[name] = []
           }
@@ -510,7 +446,7 @@
             }
           }
         },
-        propagateEvent: async function (name, data) {
+        propagateEvent: async function(name, data) {
           const results = []
           if (this._listeners?.[name]) {
             for (const [callback, onDone] of this._listeners[name]) {
@@ -534,20 +470,22 @@
           }
         },
       }
+
       window.addEventListener("message", (event) => {
         if (event.data === "fxhash_getInfo") {
+          const fx = window.$fx;
           parent.postMessage({
             id: "fxhash_getInfo",
             data: { 
-              version: window.$fx._version,
-              hash: window.$fx.hash,
-              iteration: window.$fx.iteration,
-              features: window.$fx.getFeatures(),
+              version: fx._version,
+              hash: fx.hash,
+              iteration: fx.iteration,
+              features: fx.getFeatures(),
               params: {
-                definitions: window.$fx.getDefinitions(),
-                values: window.$fx.getRawParams(),
+                definitions: fx.getDefinitions(),
+                values: fx.getRawParams(),
               },
-              minter: window.$fx.minter,
+              minter: fx.minter,
             },
           }, "*")
         }
@@ -570,4 +508,3 @@
     <!-- WEBPACK will inject the bundle.js here -->
   </body>
 </html>
-
