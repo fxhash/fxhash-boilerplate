@@ -442,7 +442,10 @@
         minter: fxminter,
         randminter: fxrandminter,
 
+        iteration: search.get('fxiteration') || 1,
+
         context: search.get("fxcontext") || "standalone",
+
         preview: fxpreview,
         isPreview: isFxpreview,
         params: function(definition) {
@@ -534,6 +537,7 @@
             data: { 
               version: window.$fx._version,
               hash: window.$fx.hash,
+              iteration: window.$fx.iteration,
               features: window.$fx.getFeatures(),
               params: {
                 definitions: window.$fx.getDefinitions(),
