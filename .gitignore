@@ -1,0 +1,5 @@
+lib/fxlens/**
+node_modules
+dist
+dist-zipped
+config.bat
