@@ -412,8 +412,7 @@
           this.inputBytes = bytes
         },
         _emitParams: function (newRawValues) {
-          this._receiveUpdateParams(newRawValues, () => {
-            const constrained = Object.keys(newRawValues).reduce(
+          const constrainedValues = Object.keys(newRawValues).reduce(
               (acc, paramId) => {
                 acc[paramId] = processParam(
                   paramId,
@@ -425,11 +424,12 @@
               },
               {}
             )
+          this._receiveUpdateParams(constrainedValues, () => {
             parent.postMessage(
               {
-                id: "fxhash_emitParams",
+                id: "fxhash_emit:params:update",
                 data: {
-                  params: constrained,
+                  params: constrainedValues,
                 },
               },
               "*"
@@ -521,7 +521,7 @@
         },
         emit: function (id, data) {
           switch (id) {
-            case "updateParams":
+            case "params:update":
               this._emitParams(data)
               break
             default:
