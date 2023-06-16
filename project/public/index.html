@@ -32,7 +32,6 @@
       regex = new RegExp(".{" + ((fxminterTrunc.length/4)|0) + "}", 'g')
       hashes = fxminterTrunc.match(regex).map(h => b58dec(h))
       var fxrandminter = sfc32(...hashes)
-
       // true if preview mode active, false otherwise
       // you can append preview=1 to the URL to simulate preview active
       var isFxpreview = search.get('preview') === "1"
@@ -43,31 +42,24 @@
         // setTimeout(() => fxpreview(), 500)
       }
       // get the byte params from the URL
-      // get the byte params from the URL
       const searchParams = search.get("fxparams")
       let initialInputBytes = searchParams?.replace("0x", "")
-      const debounce = (func, delay) => {
-        let t
-        let isFirstCall = true
+      const throttle = (func, delay) => {
+        let isThrottled = false
+
         return function (...args) {
-          const c = this
-          if (isFirstCall) {
-            func.apply(c, args)
-            isFirstCall = false
-          } else {
-            clearTimeout(t)
-            t = setTimeout(() => {
-              func.apply(c, args)
+          if (!isThrottled) {
+            func.apply(this, args)
+            isThrottled = true
+            
+            setTimeout(() => {
+              isThrottled = false
             }, delay)
           }
         }
       }
 
-      const _updateUrl = debounce((url) => {
-        window.history.pushState({ path: url.href }, "", url.href)
-      }, 300)
-
-      const stringToHex = function (s) {
+      const stringToHex = (s) => {
         let rtn = ""
         for (let i = 0; i < s.length; i++) {
           rtn += s.charCodeAt(i).toString(16).padStart(4, "0")
@@ -75,7 +67,7 @@
         return rtn
       }
 
-      function completeHexColor(hexCode) {
+      const completeHexColor = (hexCode) => {
         let hex = hexCode.replace("#", "")
         if (hex.length === 6) {
           hex = `${hex}ff`
@@ -302,7 +294,7 @@
       }
 
       // Utility function to get parameter value, default value, or a random value
-      function getParamValue(param, def, processor) {
+      const getParamValue = (param, def, processor) => {
         if (typeof param !== "undefined") return param
         if (typeof def.default !== "undefined") return def.default
         return processor.random(def)
@@ -310,7 +302,7 @@
 
       // params are injected into the piece using the binary representation of the
       // numbers, to keep precision
-      function serializeParams(params, definition) {
+      const serializeParams = (params, definition) => {
         // Initialization of the hex string for parameters
         let hexString = ""
         // If definition is not provided, return an empty hex string
@@ -377,7 +369,7 @@
       }
 
       window.$fx = {
-        _version: "3.0.0",
+        _version: "3.1.0",
         _processors: processors,
         // where params def & features will be stored
         _params: undefined,
@@ -386,7 +378,7 @@
         _paramValues: {},
         _listeners: {},
         _receiveUpdateParams: async function (newRawValues, onDefault) {
-          const handlers = await this.call("updateParams", newRawValues)
+          const handlers = await this.propagateEvent("params:update", newRawValues)
           handlers.forEach(([handled, onDone]) => {
             if (!handled) {
               this._updateParams(newRawValues)
@@ -418,9 +410,6 @@
         _updateInputBytes: function () {
           const bytes = serializeParams(this._rawValues, this._params)
           this.inputBytes = bytes
-          const url = new URL(window.location.href)
-          url.searchParams.set("fxparams", `0x${bytes}`)
-          _updateUrl(url)
         },
         _emitParams: function (newRawValues) {
           this._receiveUpdateParams(newRawValues, () => {
@@ -453,6 +442,7 @@
         minter: fxminter,
         randminter: fxrandminter,
 
+        context: search.get("fxcontext") || "standalone",
         preview: fxpreview,
         isPreview: isFxpreview,
         params: function(definition) {
@@ -487,7 +477,7 @@
           return this._rawValues
         },
         getDefinitions: function() {
-          return this._params;
+          return this._params
         },
         stringifyParams: function(params) {
           return JSON.stringify(
@@ -504,25 +494,24 @@
             this._listeners[name] = []
           }
           this._listeners[name].push([callback, onDone])
-          return function removeListener() {
-            const index = this._listeners[eventName].findIndex(
+          return () => {
+            const index = this._listeners[name].findIndex(
               ([c]) => c === callback
             )
             if (index > -1) {
-              this._listeners[eventName].splice(index, 1)
+              this._listeners[name].splice(index, 1)
             }
           }
         },
-        call: async function (name, data) {
+        propagateEvent: async function (name, data) {
           const results = []
-          if (this._listeners && this._listeners[name]) {
+          if (this._listeners?.[name]) {
             for (const [callback, onDone] of this._listeners[name]) {
               const result = callback(data)
-              if (result instanceof Promise) {
-                results.push([await result, onDone])
-              } else {
-                results.push([result, onDone])
-              }
+              results.push([
+                result instanceof Promise ? (await result) : result,
+                onDone
+              ])
             }
           }
           return results
@@ -554,7 +543,7 @@
             },
           }, "*")
         }
-        if (event.data?.id === "fxhash_updateParams") {
+        if (event.data?.id === "fxhash_params:update") {
           const { params } = event.data.data
           if (params) window.$fx._receiveUpdateParams(params)
         }
