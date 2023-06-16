@@ -4,488 +4,557 @@
     <title>FXHASH project</title>
     <meta charset="utf-8" />
     <script id="fxhash-snippet">
-            //---- do not edit the following code (you can indent as you wish)
-            let search = new URLSearchParams(window.location.search)
-            let alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
-            let b58dec = str=>[...str].reduce((p,c)=>p*alphabet.length+alphabet.indexOf(c)|0, 0)
-            let sfc32 = (a, b, c, d) => {
-              return () => {
-                a |= 0; b |= 0; c |= 0; d |= 0
-                var t = (a + b | 0) + d | 0
-                d = d + 1 | 0
-                a = b ^ b >>> 9
-                b = c + (c << 3) | 0
-                c = c << 21 | c >>> 11
-                c = c + t | 0
-                return (t >>> 0) / 4294967296
-              }
-            }
-            let rndHash = (n) => Array(n).fill(0).map(_=>alphabet[(Math.random()*alphabet.length)|0]).join("")
-            let matcher = (str, start) => str.slice(start).match(new RegExp(".{"+((str.length-start)>>2)+"}","g")).map(b58dec)
-            // make fxrand from hash
-            var fxhash = search.get("fxhash") || "oo" + rndHash(49)
-            var fxrand = sfc32(...matcher(fxhash, 2))
-            // make fxrandminter from minter address
-            var fxminter = search.get("fxminter") || "tz1" + rndHash(33)
-            var fxrandminter = sfc32(...matcher(fxminter, 3))
-            // true if preview mode active, false otherwise
-            // you can append preview=1 to the URL to simulate preview active
-            var isFxpreview = search.get("preview") === "1"
-            // call this method to trigger the preview
-            function fxpreview() {
-              console.log("FXPREVIEW")
-              // window.dispatchEvent(new Event("fxhash-preview"))
-              // setTimeout(() => fxpreview(), 500)
-            }
-            // get the byte params from the URL
-            let fxparams = search.get("fxparams")
-            let initialInputBytes =  fxparams ? fxparams.replace("0x", "") : fxparams
-            const throttle = (func, delay) => {
-              let isThrottled = false
+      //---- do not edit the following code (you can indent as you wish)
+      let search = new URLSearchParams(window.location.search)
+      let alphabet =
+        "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
+      let b58dec = (str) =>
+        [...str].reduce(
+          (p, c) => (p * alphabet.length + alphabet.indexOf(c)) | 0,
+          0
+        )
+      let sfc32 = (a, b, c, d) => {
+        return () => {
+          a |= 0
+          b |= 0
+          c |= 0
+          d |= 0
+          var t = (((a + b) | 0) + d) | 0
+          d = (d + 1) | 0
+          a = b ^ (b >>> 9)
+          b = (c + (c << 3)) | 0
+          c = (c << 21) | (c >>> 11)
+          c = (c + t) | 0
+          return (t >>> 0) / 4294967296
+        }
+      }
+      let rndHash = (n) =>
+        Array(n)
+          .fill(0)
+          .map((_) => alphabet[(Math.random() * alphabet.length) | 0])
+          .join("")
+      let matcher = (str, start) =>
+        str
+          .slice(start)
+          .match(new RegExp(".{" + ((str.length - start) >> 2) + "}", "g"))
+          .map(b58dec)
+      // make fxrand from hash
+      var fxhash = search.get("fxhash") || "oo" + rndHash(49)
+      var fxrand = sfc32(...matcher(fxhash, 2))
+      // make fxrandminter from minter address
+      var fxminter = search.get("fxminter") || "tz1" + rndHash(33)
+      var fxrandminter = sfc32(...matcher(fxminter, 3))
+      // true if preview mode active, false otherwise
+      // you can append preview=1 to the URL to simulate preview active
+      var isFxpreview = search.get("preview") === "1"
+      // call this method to trigger the preview
+      function fxpreview() {
+        console.log("FXPREVIEW")
+        // window.dispatchEvent(new Event("fxhash-preview"))
+        // setTimeout(() => fxpreview(), 500)
+      }
+      // get the byte params from the URL
+      let fxparams = search.get("fxparams")
+      let initialInputBytes = fxparams ? fxparams.replace("0x", "") : fxparams
+      const throttle = (func, delay) => {
+        let isThrottled = false
 
-              return function (...args) {
-                if (!isThrottled) {
-                  func.apply(this, args)
-                  isThrottled = true
+        return function (...args) {
+          if (!isThrottled) {
+            func.apply(this, args)
+            isThrottled = true
 
-                  setTimeout(() => {
-                    isThrottled = false
-                  }, delay)
-                }
-              }
-            }
+            setTimeout(() => {
+              isThrottled = false
+            }, delay)
+          }
+        }
+      }
 
-            const stringToHex = (s) => {
-              let rtn = ""
-              for (let i = 0; i < s.length; i++) {
-                rtn += s.charCodeAt(i).toString(16).padStart(4, "0")
-              }
-              return rtn
-            }
+      const stringToHex = (s) => {
+        let rtn = ""
+        for (let i = 0; i < s.length; i++) {
+          rtn += s.charCodeAt(i).toString(16).padStart(4, "0")
+        }
+        return rtn
+      }
 
-            const completeHexColor = (hexCode) => {
-              let hex = hexCode.replace("#", "")
-              if (hex.length === 6) {
-                hex = `${hex}ff`
-              }
-              if (hex.length === 3) {
-                hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}ff`
-              }
-              return hex
-            }
+      const completeHexColor = (hexCode) => {
+        let hex = hexCode.replace("#", "")
+        if (hex.length === 6) {
+          hex = `${hex}ff`
+        }
+        if (hex.length === 3) {
+          hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}ff`
+        }
+        return hex
+      }
 
-            function* asBytes(hex, n) {
-              n *= 2
-              for (let i = 0; i < n; i += 2)
-                yield parseInt(hex.substring(i, i + 2), 16)
-            }
+      function* asBytes(hex, n) {
+        n *= 2
+        for (let i = 0; i < n; i += 2)
+          yield parseInt(hex.substring(i, i + 2), 16)
+      }
 
-            function minmax($min, $max, minDef = Number.MIN_SAFE_INTEGER, maxDef = Number.MAX_SAFE_INTEGER, clamp = true) {
-              return {
-                min: $min !== undefined ? clamp ? Math.max(Number($min), minDef) : Number($min) : minDef,
-                max: $max !== undefined ? clamp ? Math.min(Number($max), maxDef) : Number($max) : maxDef,
-              }
-            }
+      function minmax(
+        $min,
+        $max,
+        minDef = Number.MIN_SAFE_INTEGER,
+        maxDef = Number.MAX_SAFE_INTEGER,
+        clamp = true
+      ) {
+        return {
+          min:
+            $min !== undefined
+              ? clamp
+                ? Math.max(Number($min), minDef)
+                : Number($min)
+              : minDef,
+          max:
+            $max !== undefined
+              ? clamp
+                ? Math.min(Number($max), maxDef)
+                : Number($max)
+              : maxDef,
+        }
+      }
 
-            function U8(x) {
-              return ((x >>> 0) & 0xff).toString(16).padStart(2, "0")
-            }
+      function U8(x) {
+        return ((x >>> 0) & 0xff).toString(16).padStart(2, "0")
+      }
 
-            function U32(x) {
-              return (x >>> 0).toString(16).padStart(8, "0")
-            }
+      function U32(x) {
+        return (x >>> 0).toString(16).padStart(8, "0")
+      }
 
-            function U64(x) {
-              return BigInt.asUintN(64, x).toString(16).padStart(16, "0")
-            }
+      function U64(x) {
+        return BigInt.asUintN(64, x).toString(16).padStart(16, "0")
+      }
 
-            // the parameter processor, used to parse fxparams
-            const processors = {
-              number: {
-                serialize: (input) =>
+      // the parameter processor, used to parse fxparams
+      const processors = {
+        number: {
+          serialize: (input) =>
             U64(new BigUint64Array(new Float64Array([input]).buffer)[0]),
-                bytesLength: () => 8,
-                deserialize: (input) => new Float64Array(new BigUint64Array([BigInt("0x" + input)]).buffer)[0],
-                constrain: (value, { options }) => {
-                  const { min, max } = minmax(options?.min, options?.max)
-                  return Math.min(Math.max(value, min), max)
-                },
-                random: ({ options }) => {
-                  const { min, max } = minmax(options?.min, options?.max)
-                  const v = Math.random() * (max - min) + min
-                  if (options?.step) {
-                    const t = 1.0 / options.step
-                    return Math.round(v * t) / t
-                  }
-                  return v
-                },
-              },
-              bigint: {
-                serialize: U64,
-                bytesLength: () => 8,
-                deserialize: (input) => BigInt.asIntN(64, BigInt("0x" + input)),
-                random: ({ options }) => {
-                  const MIN_SAFE_INT64 = -9223372036854775808n
-                  const MAX_SAFE_INT64 = 9223372036854775807n
-                  if (options?.min !== undefined) {
-                    min = BigInt(options.min)
-                    if (min < MIN_SAFE_INT64) min = MIN_SAFE_INT64
-                  }
-                  if (options?.max !== undefined) {
-                    max = BigInt(options.max)
-                    if (max > MAX_SAFE_INT64) max = MAX_SAFE_INT64
-                  }
-                  const range = max - min
-                  const bits = range.toString(2).length
-                  let random
-                  do {
-                    random = BigInt(
-                      "0x" +
-                        Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8))))
-                          .map((x) => x.toString(16).padStart(2,"0"))
-                          .join("")
-                    )
-                  } while (random > range)
-                  return random + min
-                },
-              },
-              boolean: {
-                serialize: (input) => (!!input ? "01" : "00"),
-                bytesLength: () => 1,
-                deserialize: (input) => input !== "00",
-                random: () => Math.random() < 0.5,
-              },
-              color: {
-                serialize: (input) => completeHexColor(input),
-                bytesLength: () => 4,
-                deserialize: (input) => input,
-                transform: (input) => {
-                  const [r, g, b, a] = asBytes(input, 4)
-                  return {
-                    hex: {
-                      rgb: "#" + input.slice(0, 6),
-                      rgba: "#" + input,
-                    },
-                    obj: {
-                      rgb: { r, g, b },
-                      rgba: { r, g, b, a },
-                    },
-                    arr: {
-                      rgb: [r, g, b],
-                      rgba: [r, g, b, a],
-                    },
-                  }
-                },
-                constrain: (value) => value.replace("#", "").slice(0, 8).padEnd(8, "f"),
-                random: () => ((Math.random() * 0x100000000) >>> 0).toString(16).padStart(8, "0"),
-              },
-              string: {
-                serialize: (input, def) => {
-                  const max = processors.string.bytesLength(def)
-                  const buf = new Uint8Array(max)
-                  new TextEncoder().encodeInto(input, buf)
-                  return Array.from(buf).map(U8).join("")
-                },
-                bytesLength: (options) => options?.maxLength !== undefined ? Number(options.maxLength) : 64,
-                deserialize: (input, { options }) => {
-                  const buf = new Uint8Array(asBytes(input, processors.string.bytesLength(options)))
-                  const idx = buf.indexOf(0)
-                  return new TextDecoder().decode(idx !== -1 ? buf.subarray(0, idx) : buf)
-                },
-                constrain: (value, { options }) => {
-                  const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
-                  return value.length > max
-                    ? value.slice(0, max)
-                    : value.length < min
-                    ? value.padEnd(min)
-                    : value
-                },
-                random: ({ options }) => {
-                  const { min, max } = minmax(options?.minLength, options?.maxLength, 0, 64, false)
-                  const length = Math.round(Math.random() * (max - min) + min)
-                  return [...Array(length)].map(() => (~~(Math.random() * 36)).toString(36)).join("")
-                },
-              },
-              select: {
-                serialize: (input, { options }) => U8(Math.max(0, Math.min(255, options?.options.indexOf(input) || 0))),
-                bytesLength: () => 1,
-                deserialize: (input, def) => def.options.options[parseInt(input, 16)] || def.default,
-                constrain: (value, { options }) => options.options.includes(value)
-                  ? value
-                  : options.options[0],
-                random: ({ options }) => options.options[~~(Math.random() * options.options.length)],
-              },
+          bytesLength: () => 8,
+          deserialize: (input) =>
+            new Float64Array(
+              new BigUint64Array([BigInt("0x" + input)]).buffer
+            )[0],
+          constrain: (value, { options }) => {
+            const { min, max } = minmax(options?.min, options?.max)
+            return Math.min(Math.max(value, min), max)
+          },
+          random: ({ options }) => {
+            const { min, max } = minmax(options?.min, options?.max)
+            const v = Math.random() * (max - min) + min
+            if (options?.step) {
+              const t = 1.0 / options.step
+              return Math.round(v * t) / t
             }
-
-            // Utility function to get parameter value, default value, or a random value
-            const getParamValue = (param, def, processor) => {
-              if (typeof param !== "undefined") return param
-              if (typeof def.default !== "undefined") return def.default
-              return processor.random(def)
+            return v
+          },
+        },
+        bigint: {
+          serialize: U64,
+          bytesLength: () => 8,
+          deserialize: (input) => BigInt.asIntN(64, BigInt("0x" + input)),
+          random: ({ options }) => {
+            const MIN_SAFE_INT64 = -9223372036854775808n
+            const MAX_SAFE_INT64 = 9223372036854775807n
+            if (options?.min !== undefined) {
+              min = BigInt(options.min)
+              if (min < MIN_SAFE_INT64) min = MIN_SAFE_INT64
             }
-
-            // params are injected into the piece using the binary representation of the
-            // numbers, to keep precision
-            const serializeParams = (params, definition) => {
-              // Initialization of the hex string for parameters
-              let hexString = ""
-              // If definition is not provided, return an empty hex string
-              if (!definition) return hexString
-              // Iterating over the definitions
-              for (const def of definition) {
-                const { id, type } = def
-                // Get the processor for the given type
-                const processor = processors[type]
-                // Get the param value, fall back to default or a random value
-                const paramValue = getParamValue(params[id], def, processor)
-                // Serialize the param value
-                const serializedParam = processor.serialize(paramValue, def)
-                // Concatenate serialized params
-                hexString += serializedParam
-              }
-              return hexString
+            if (options?.max !== undefined) {
+              max = BigInt(options.max)
+              if (max > MAX_SAFE_INT64) max = MAX_SAFE_INT64
             }
-
-            // takes the parameters as bytes and outputs an object with the
-            // deserialized parameters, identified by their id in an object
-            const deserializeParams = (bytes, definitions) => {
-              const params = {}
-              for (const def of definitions) {
-                const processor = processors[def.type]
-                // if we don't have any parameters defined in the URL, set the
-                // default value and move on
-                if (!bytes) {
-                  const v = def.default === undefined ? processor.random(def) : def.default
-                  params[def.id] = processor.constrain?.(v, def) || v
-                  continue
-                }
-                // extract the length from the bytes & shift the initial bytes string
-                const len = processor.bytesLength(def?.options) * 2
-                const valueBytes = bytes.substring(0, len)
-                bytes = bytes.substring(len)
-                // deserialize the bytes into the params
-                const value =  processor.deserialize(valueBytes, def)
-                params[def.id] = processor.constrain?.(value, def) || value
-              }
-              return params
-            }
-
-            const processParam = (paramId, value, definitions, transformer) => {
-              const definition = definitions.find((d) => d.id === paramId)
-              const processor = processors[definition.type]
-              return processor[transformer]?.(value, definition) || value
-            }
-
-            const processParams = (values, definitions, transformer) => {
-              const paramValues = {}
-              for (const definition of definitions) {
-                const processor = processors[definition.type]
-                const value = values[definition.id]
-                // deserialize the bytes into the params
-                paramValues[definition.id] =
-                  processor[transformer]?.(value, definition) || value
-              }
-              return paramValues
-            }
-
-            window.$fx = {
-              _version: "3.2.0",
-              _processors: processors,
-              // where params def & features will be stored
-              _params: undefined,
-              _features: undefined,
-              // where the parameter values are stored
-              _paramValues: {},
-              _listeners: {},
-              _receiveUpdateParams: async function (newRawValues, onDefault) {
-                const handlers = await this.propagateEvent("params:update", newRawValues)
-                handlers.forEach(([handled, onDone]) => {
-                  if (!handled) {
-                    this._updateParams(newRawValues)
-                    onDefault?.()
-                  }
-                  onDone?.()
-                })
-                if (handlers.length === 0) {
-                  this._updateParams(newRawValues)
-                  onDefault?.()
-                }
-              },
-              _updateParams: function (newRawValues) {
-                const constrained = processParams(
-                  { ...this._rawValues, ...newRawValues },
-                  this._params,
-                  "constrain"
-                )
-                Object.keys(constrained).forEach((paramId) => {
-                  this._rawValues[paramId] = constrained[paramId]
-                })
-                this._paramValues = processParams(
-                  this._rawValues,
-                  this._params,
-                  "transform"
-                )
-                this._updateInputBytes()
-              },
-              _updateInputBytes: function () {
-                const bytes = serializeParams(this._rawValues, this._params)
-                this.inputBytes = bytes
-              },
-              _emitParams: function (newRawValues) {
-                const constrainedValues = Object.keys(newRawValues).reduce(
-                    (acc, paramId) => {
-                      acc[paramId] = processParam(
-                        paramId,
-                        newRawValues[paramId],
-                        this._params,
-                        "constrain"
-                      )
-                      return acc
-                    },
-                    {}
+            const range = max - min
+            const bits = range.toString(2).length
+            let random
+            do {
+              random = BigInt(
+                "0x" +
+                  Array.from(
+                    crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8)))
                   )
-                this._receiveUpdateParams(constrainedValues, () => {
-                  parent.postMessage(
-                    {
-                      id: "fxhash_emit:params:update",
-                      data: {
-                        params: constrainedValues,
-                      },
-                    },
-                    "*"
-                  )
-                })
+                    .map((x) => x.toString(16).padStart(2, "0"))
+                    .join("")
+              )
+            } while (random > range)
+            return random + min
+          },
+        },
+        boolean: {
+          serialize: (input) => (!!input ? "01" : "00"),
+          bytesLength: () => 1,
+          deserialize: (input) => input !== "00",
+          random: () => Math.random() < 0.5,
+        },
+        color: {
+          serialize: (input) => completeHexColor(input),
+          bytesLength: () => 4,
+          deserialize: (input) => input,
+          transform: (input) => {
+            const [r, g, b, a] = asBytes(input, 4)
+            return {
+              hex: {
+                rgb: "#" + input.slice(0, 6),
+                rgba: "#" + input,
               },
-              hash: fxhash,
-              rand: fxrand,
-              minter: fxminter,
-              randminter: fxrandminter,
-              resetRandSeed: function() {
-                this.rand = fxrand = sfc32(...matcher(this.hash, 2))
+              obj: {
+                rgb: { r, g, b },
+                rgba: { r, g, b, a },
               },
-              resetRandminterSeed: function() {
-                this.randminter = fxminter = sfc32(...matcher(this.minter, 3))
-              },
-              resetSeed: function() {
-                this.resetRandSeed()
-                this.resetRandminterSeed()
-              },
-
-              iteration: search.get('fxiteration') || 1,
-              context: search.get("fxcontext") || "standalone",
-
-              preview: fxpreview,
-              isPreview: isFxpreview,
-
-              params: function(definition) {
-                this._params = definition
-                this._rawValues = deserializeParams(initialInputBytes, definition)
-                this._paramValues = processParams(
-                  this._rawValues,
-                  definition,
-                  "transform"
-                )
-                this._updateInputBytes()
-              },
-              features: function(features) {
-                this._features = features
-              },
-              getFeature: function(id) {
-                return this._features[id]
-              },
-              getFeatures: function() {
-                return this._features
-              },
-              getParam: function(id) {
-                return this._paramValues[id]
-              },
-              getParams: function() {
-                return this._paramValues
-              },
-              getRawParam: function(id) {
-                return this._rawValues[id]
-              },
-              getRawParams: function() {
-                return this._rawValues
-              },
-              getDefinitions: function() {
-                return this._params
-              },
-              stringifyParams: function(params) {
-                return JSON.stringify(
-                  params || this._rawValues,
-                  (key, value) => {
-                    if (typeof value === "bigint") return value.toString()
-                    return value
-                  },
-                  2,
-                )
-              },
-              on: function (name, callback, onDone) {
-                if (!this._listeners[name]) {
-                  this._listeners[name] = []
-                }
-                this._listeners[name].push([callback, onDone])
-                return () => {
-                  const index = this._listeners[name].findIndex(
-                    ([c]) => c === callback
-                  )
-                  if (index > -1) {
-                    this._listeners[name].splice(index, 1)
-                  }
-                }
-              },
-              propagateEvent: async function (name, data) {
-                const results = []
-                if (this._listeners?.[name]) {
-                  for (const [callback, onDone] of this._listeners[name]) {
-                    const result = callback(data)
-                    results.push([
-                      result instanceof Promise ? (await result) : result,
-                      onDone
-                    ])
-                  }
-                }
-                return results
-              },
-              emit: function (id, data) {
-                switch (id) {
-                  case "params:update":
-                    this._emitParams(data)
-                    break
-                  default:
-                    console.log("$fx.emit called with unknown id:", id)
-                    break
-                }
+              arr: {
+                rgb: [r, g, b],
+                rgba: [r, g, b, a],
               },
             }
+          },
+          constrain: (value) =>
+            value.replace("#", "").slice(0, 8).padEnd(8, "f"),
+          random: () =>
+            ((Math.random() * 0x100000000) >>> 0).toString(16).padStart(8, "0"),
+        },
+        string: {
+          serialize: (input, def) => {
+            const max = processors.string.bytesLength(def)
+            const buf = new Uint8Array(max)
+            new TextEncoder().encodeInto(input, buf)
+            return Array.from(buf).map(U8).join("")
+          },
+          bytesLength: (options) =>
+            options?.maxLength !== undefined ? Number(options.maxLength) : 64,
+          deserialize: (input, { options }) => {
+            const buf = new Uint8Array(
+              asBytes(input, processors.string.bytesLength(options))
+            )
+            const idx = buf.indexOf(0)
+            return new TextDecoder().decode(
+              idx !== -1 ? buf.subarray(0, idx) : buf
+            )
+          },
+          constrain: (value, { options }) => {
+            const { min, max } = minmax(
+              options?.minLength,
+              options?.maxLength,
+              0,
+              64,
+              false
+            )
+            return value.length > max
+              ? value.slice(0, max)
+              : value.length < min
+              ? value.padEnd(min)
+              : value
+          },
+          random: ({ options }) => {
+            const { min, max } = minmax(
+              options?.minLength,
+              options?.maxLength,
+              0,
+              64,
+              false
+            )
+            const length = Math.round(Math.random() * (max - min) + min)
+            return [...Array(length)]
+              .map(() => (~~(Math.random() * 36)).toString(36))
+              .join("")
+          },
+        },
+        select: {
+          serialize: (input, { options }) =>
+            U8(
+              Math.max(0, Math.min(255, options?.options.indexOf(input) || 0))
+            ),
+          bytesLength: () => 1,
+          deserialize: (input, def) =>
+            def.options.options[parseInt(input, 16)] || def.default,
+          constrain: (value, { options }) =>
+            options.options.includes(value) ? value : options.options[0],
+          random: ({ options }) =>
+            options.options[~~(Math.random() * options.options.length)],
+        },
+      }
 
-            window.addEventListener("message", (event) => {
-              if (event.data === "fxhash_getInfo") {
-                const fx = window.$fx
-                parent.postMessage({
-                  id: "fxhash_getInfo",
-                  data: {
-                    version: fx._version,
-                    hash: fx.hash,
-                    features: fx.getFeatures(),
-                    iteration: fx.iteration,
-                    params: {
-                      definitions: fx.getDefinitions(),
-                      values: fx.getRawParams(),
-                    },
-                    minter: fx.minter,
-                  },
-                }, "*")
-              }
-              if (event.data?.id === "fxhash_params:update") {
-                const { params } = event.data.data
-                if (params) window.$fx._receiveUpdateParams(params)
-              }
-            })
-            // END NEW
+      // Utility function to get parameter value, default value, or a random value
+      const getParamValue = (param, def, processor) => {
+        if (typeof param !== "undefined") return param
+        if (typeof def.default !== "undefined") return def.default
+        return processor.random(def)
+      }
 
-            //---- /do not edit the following code
+      // params are injected into the piece using the binary representation of the
+      // numbers, to keep precision
+      const serializeParams = (params, definition) => {
+        // Initialization of the hex string for parameters
+        let hexString = ""
+        // If definition is not provided, return an empty hex string
+        if (!definition) return hexString
+        // Iterating over the definitions
+        for (const def of definition) {
+          const { id, type } = def
+          // Get the processor for the given type
+          const processor = processors[type]
+          // Get the param value, fall back to default or a random value
+          const paramValue = getParamValue(params[id], def, processor)
+          // Serialize the param value
+          const serializedParam = processor.serialize(paramValue, def)
+          // Concatenate serialized params
+          hexString += serializedParam
+        }
+        return hexString
+      }
+
+      // takes the parameters as bytes and outputs an object with the
+      // deserialized parameters, identified by their id in an object
+      const deserializeParams = (bytes, definitions) => {
+        const params = {}
+        for (const def of definitions) {
+          const processor = processors[def.type]
+          // if we don't have any parameters defined in the URL, set the
+          // default value and move on
+          if (!bytes) {
+            const v =
+              def.default === undefined ? processor.random(def) : def.default
+            params[def.id] = processor.constrain?.(v, def) || v
+            continue
+          }
+          // extract the length from the bytes & shift the initial bytes string
+          const len = processor.bytesLength(def?.options) * 2
+          const valueBytes = bytes.substring(0, len)
+          bytes = bytes.substring(len)
+          // deserialize the bytes into the params
+          const value = processor.deserialize(valueBytes, def)
+          params[def.id] = processor.constrain?.(value, def) || value
+        }
+        return params
+      }
+
+      const processParam = (paramId, value, definitions, transformer) => {
+        const definition = definitions.find((d) => d.id === paramId)
+        const processor = processors[definition.type]
+        return processor[transformer]?.(value, definition) || value
+      }
+
+      const processParams = (values, definitions, transformer) => {
+        const paramValues = {}
+        for (const definition of definitions) {
+          const processor = processors[definition.type]
+          const value = values[definition.id]
+          // deserialize the bytes into the params
+          paramValues[definition.id] =
+            processor[transformer]?.(value, definition) || value
+        }
+        return paramValues
+      }
+
+      window.$fx = {
+        _version: "3.2.0",
+        _processors: processors,
+        // where params def & features will be stored
+        _params: undefined,
+        _features: undefined,
+        // where the parameter values are stored
+        _paramValues: {},
+        _listeners: {},
+        _receiveUpdateParams: async function (newRawValues, onDefault) {
+          const handlers = await this.propagateEvent(
+            "params:update",
+            newRawValues
+          )
+          handlers.forEach(([handled, onDone]) => {
+            if (!handled) {
+              this._updateParams(newRawValues)
+              onDefault?.()
+            }
+            onDone?.()
+          })
+          if (handlers.length === 0) {
+            this._updateParams(newRawValues)
+            onDefault?.()
+          }
+        },
+        _updateParams: function (newRawValues) {
+          const constrained = processParams(
+            { ...this._rawValues, ...newRawValues },
+            this._params,
+            "constrain"
+          )
+          Object.keys(constrained).forEach((paramId) => {
+            this._rawValues[paramId] = constrained[paramId]
+          })
+          this._paramValues = processParams(
+            this._rawValues,
+            this._params,
+            "transform"
+          )
+          this._updateInputBytes()
+        },
+        _updateInputBytes: function () {
+          const bytes = serializeParams(this._rawValues, this._params)
+          this.inputBytes = bytes
+        },
+        _emitParams: function (newRawValues) {
+          const constrainedValues = Object.keys(newRawValues).reduce(
+            (acc, paramId) => {
+              acc[paramId] = processParam(
+                paramId,
+                newRawValues[paramId],
+                this._params,
+                "constrain"
+              )
+              return acc
+            },
+            {}
+          )
+          this._receiveUpdateParams(constrainedValues, () => {
+            parent.postMessage(
+              {
+                id: "fxhash_emit:params:update",
+                data: {
+                  params: constrainedValues,
+                },
+              },
+              "*"
+            )
+          })
+        },
+        hash: fxhash,
+        rand: fxrand,
+        minter: fxminter,
+        randminter: fxrandminter,
+        resetRandSeed: function () {
+          this.rand = fxrand = sfc32(...matcher(this.hash, 2))
+        },
+        resetRandminterSeed: function () {
+          this.randminter = fxminter = sfc32(...matcher(this.minter, 3))
+        },
+        resetSeed: function () {
+          this.resetRandSeed()
+          this.resetRandminterSeed()
+        },
+
+        iteration: search.get("fxiteration") || 1,
+        context: search.get("fxcontext") || "standalone",
+
+        preview: fxpreview,
+        isPreview: isFxpreview,
+
+        params: function (definition) {
+          this._params = definition
+          this._rawValues = deserializeParams(initialInputBytes, definition)
+          this._paramValues = processParams(
+            this._rawValues,
+            definition,
+            "transform"
+          )
+          this._updateInputBytes()
+        },
+        features: function (features) {
+          this._features = features
+        },
+        getFeature: function (id) {
+          return this._features[id]
+        },
+        getFeatures: function () {
+          return this._features
+        },
+        getParam: function (id) {
+          return this._paramValues[id]
+        },
+        getParams: function () {
+          return this._paramValues
+        },
+        getRawParam: function (id) {
+          return this._rawValues[id]
+        },
+        getRawParams: function () {
+          return this._rawValues
+        },
+        getDefinitions: function () {
+          return this._params
+        },
+        stringifyParams: function (params) {
+          return JSON.stringify(
+            params || this._rawValues,
+            (key, value) => {
+              if (typeof value === "bigint") return value.toString()
+              return value
+            },
+            2
+          )
+        },
+        on: function (name, callback, onDone) {
+          if (!this._listeners[name]) {
+            this._listeners[name] = []
+          }
+          this._listeners[name].push([callback, onDone])
+          return () => {
+            const index = this._listeners[name].findIndex(
+              ([c]) => c === callback
+            )
+            if (index > -1) {
+              this._listeners[name].splice(index, 1)
+            }
+          }
+        },
+        propagateEvent: async function (name, data) {
+          const results = []
+          if (this._listeners?.[name]) {
+            for (const [callback, onDone] of this._listeners[name]) {
+              const result = callback(data)
+              results.push([
+                result instanceof Promise ? await result : result,
+                onDone,
+              ])
+            }
+          }
+          return results
+        },
+        emit: function (id, data) {
+          switch (id) {
+            case "params:update":
+              this._emitParams(data)
+              break
+            default:
+              console.log("$fx.emit called with unknown id:", id)
+              break
+          }
+        },
+      }
+
+      window.addEventListener("message", (event) => {
+        if (event.data === "fxhash_getInfo") {
+          const fx = window.$fx
+          parent.postMessage(
+            {
+              id: "fxhash_getInfo",
+              data: {
+                version: fx._version,
+                hash: fx.hash,
+                features: fx.getFeatures(),
+                iteration: fx.iteration,
+                params: {
+                  definitions: fx.getDefinitions(),
+                  values: fx.getRawParams(),
+                },
+                minter: fx.minter,
+              },
+            },
+            "*"
+          )
+        }
+        if (event.data?.id === "fxhash_params:update") {
+          const { params } = event.data.data
+          if (params) window.$fx._receiveUpdateParams(params)
+        }
+      })
+      // END NEW
+
+      //---- /do not edit the following code
     </script>
 
     <link rel="stylesheet" href="./style.css" />
