@@ -1,5 +1,13 @@
-// console.log(fxhash);
-// console.log(fxrand());
+// demonstrate seed reset
+// for (let i = 0; i < 10; i++) {
+//   console.log(i, $fx.rand(), $fx.randminter())
+// }
+
+// $fx.resetSeed();
+
+// for (let i = 0; i < 10; i++) {
+//   console.log(i, $fx.rand(), $fx.randminter())
+// }
 
 const sp = new URLSearchParams(window.location.search)
 //  console.log(sp);
