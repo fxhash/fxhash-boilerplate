@@ -120,6 +120,9 @@ function main() {
     inputBytes: ${$fx.inputBytes}
     </p>
     <p>
+    context: ${$fx.context}
+    </p>
+    <p>
     params:
     </p>
     <pre>
@@ -139,9 +142,9 @@ function main() {
 main()
 
 $fx.on(
-  "updateParams",
+  "params:update",
   (newRawValues) => {
-    if (newRawValues.number_id.value === 5) return true
+    if (newRawValues.number_id === 5) return true
     return false
   },
   () => main()
