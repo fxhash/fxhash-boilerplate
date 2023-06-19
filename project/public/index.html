@@ -374,13 +374,16 @@
         _paramValues: {},
         _listeners: {},
         _receiveUpdateParams: async function (newRawValues, onDefault) {
-          const handlers = await this.propagateEvent("params:update", newRawValues)
-          handlers.forEach(([handled, onDone]) => {
-            if (!handled) {
+          const handlers = await this.propagateEvent(
+            "params:update",
+            newRawValues
+          )
+          handlers.forEach(([optInDefault, onDone]) => {
+            if (!(typeof optInDefault == "boolean" && !optInDefault)) {
               this._updateParams(newRawValues)
               onDefault?.()
             }
-            onDone?.()
+            onDone?.(optInDefault, newRawValues)
           })
           if (handlers.length === 0) {
             this._updateParams(newRawValues)
