@@ -486,6 +486,11 @@
         getRawParams: function() {
           return this._rawValues
         },
+        getRandomParam: function(id) {
+          const definition = this._params.find(d => d.id === id)
+          const processor = processors[definition.type]
+          return processor.random(definition)
+        },
         getDefinitions: function() {
           return this._params
         },
