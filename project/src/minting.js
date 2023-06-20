@@ -70,10 +70,15 @@ export default function minting() {
     }
   });
 
-  $fx.on("params:update", (...args) => {
-    console.log(args);
-    draw();
-  });
+  $fx.on(
+    "params:update",
+    (...args) => {
+      console.log(args);
+    },
+    () => {
+      draw();
+    }
+  );
 }
 
 // utilities
