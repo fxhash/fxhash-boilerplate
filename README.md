@@ -15,7 +15,7 @@ A boilerplate to automate and ease the creation of Generative Tokens on fx(hash)
 
 ### Getting started
 
-- Clone this repository: `npx degit fxhash/params-boilerplate your_project_name`
+- Clone this repository: `npx degit fxhash/params-boilerplate#hackathon-2023 your_project_name`
 - Install dependencies and fx(lens): `npm install`
 
 ## Start developing your token project
@@ -67,11 +67,11 @@ The [Guide to mint a Generative Token](https://www.fxhash.xyz/doc/artist/guide-p
 
 ## fx(params) types
 
-The following fx(params) types are available. All types share the same attributes but have different options available to e.g. constrain your parameters to your needs. 
+The following fx(params) types are available. All types share the same attributes but have different options available to e.g. constrain your parameters to your needs.
 
-The available fx(params) types are: 
+The available fx(params) types are:
 
-- `number`: `Number` aka float64 
+- `number`: `Number` aka float64
 - `bigint`: `BigInt` aka int64
 - `boolean`: `boolean`
 - `color`: Color in 8-hexdigit and abbreviations
@@ -102,9 +102,10 @@ The fxhash snippet generates a random value for each parameter. The random value
 
 #### `number`
 
-All options are optional. 
+All options are optional.
 
 Options:
+
 ```typescript
 {
   min?: number,
@@ -117,7 +118,8 @@ Options:
 
 All options are optional.
 
-Options: 
+Options:
+
 ```typescript
 {
   min?: number | bigint,
@@ -129,18 +131,20 @@ Options:
 
 No options.
 
-Options: 
+Options:
+
 ```typescript
-undefined
+undefined;
 ```
 
 #### `color`
 
 No options.
 
-Options: 
+Options:
+
 ```typescript
-undefined
+undefined;
 ```
 
 #### `string`
@@ -148,6 +152,7 @@ undefined
 All options are optional.
 
 Options:
+
 ```typescript
 {
   minLength?: number,
@@ -160,31 +165,35 @@ Options:
 Options are required. They define the options of the select
 
 Options:
+
 ```typescript
 {
   options: string[],
 }
 ```
 
-
 ### Transformation
 
 For ease of usage the fx(params) are being transformed into their type specific representation.
 
 #### `number`
+
 [getFloat64](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView/getFloat64)
 
 #### `bigint`
+
 [getBigInt64](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView/getBigInt64)
 
 #### `boolean`
+
 _not transformed_
 
 #### `string`
+
 _not transformed_
 
-
 #### `color`
+
 ```typescript
 {
  hex: {
@@ -202,7 +211,7 @@ _not transformed_
 }
 ```
 
-The fx(snippet) exposes two different way  to retrieve fx(params) values:
+The fx(snippet) exposes two different way to retrieve fx(params) values:
 
 - `getParam` and `getParams` will return the transformed values as described above
 - `getRawParam` and `getRawParams` will return the raw values after being serialized from the bytestring and without any transformation
@@ -225,5 +234,3 @@ The fx(lens) offers an interactive environment to tweak and develop your generat
 Go to https://fxhash.xyz/sandbox/ and upload the project.zip file in there to see if it works properly. If your token does not work properly, you can iterate easily by updating your files, running $ npm run build again, and upload the zip file again.
 
 Finally, you can mint your token using the same `project.zip` file.
-
-
