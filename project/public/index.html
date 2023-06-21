@@ -566,6 +566,14 @@
       })
       // END NEW
 
+      // allow the fxrand function to be reset
+      const resetFxRand = () => {
+        fxrand = sfc32(...matcher(fxhash, 2))
+        $fx.rand = fxrand
+        fxrand.reset = resetFxRand
+      }
+      fxrand.reset = resetFxRand
+
       //---- /do not edit the following code
     </script>
 
@@ -574,7 +582,13 @@
     <!-- if you need to import js scripts do it here -->
   </head>
   <body>
-    
+    <div id="infos">
+      Drag the circle to define the position. <br/>
+      Scroll on the circle to change its size.
+    </div>
+    <canvas width="512" height="512" id="canvas"></canvas>
+    <div id="details">
+    </div>
     <!-- WEBPACK will inject the bundle.js here -->
   </body>
 </html>

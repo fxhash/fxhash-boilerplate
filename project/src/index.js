@@ -63,7 +63,23 @@ $fx.params([
       step: 0.000001,
     },
   },
+  {
+    id: "size",
+    name: "Size",
+    type: "number",
+    update: "code-driven",
+    default: 0.02,
+    options: {
+      min: 0.01,
+      max: 0.2,
+      step: 0.00001,
+    },
+  },
 ]);
+
+// we add the context as a class to the body, this way we can fine-tune the
+// elements in CSS based on the context
+document.body.classList.add($fx.context);
 
 // the piece is executed in "minting" mode; so we need to display a custom
 // minting interface; this can be anything, it doesn't have to be some code

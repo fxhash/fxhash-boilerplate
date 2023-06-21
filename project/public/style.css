@@ -2,3 +2,42 @@
 	margin: 0;
 	padding: 0;
 }
+
+body {
+	font-family: monospace;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	height: 100vh;
+	gap: 1em;
+	background-color: rgb(226, 226, 226);
+}
+
+canvas {
+	border: 3px solid black;
+	background-color: white;
+}
+
+#details {
+	display: none;
+}
+
+#infos {
+	display: none;
+}
+
+body.minting #details {
+	display: grid;
+	grid-template-columns: max-content max-content;
+	gap: 0.2em 1em;
+}
+
+body.minting #infos {
+	display: block;
+	font-weight: bold;
+}
+
+body.minting canvas {
+	border: 3px solid blue;
+}
