@@ -439,17 +439,6 @@
         rand: fxrand,
         minter: fxminter,
         randminter: fxrandminter,
-        resetRandSeed: function() {
-          this.rand = fxrand = sfc32(...matcher(this.hash, 2))
-        },
-        resetRandminterSeed: function() {
-          this.randminter = fxminter = sfc32(...matcher(this.minter, 3))
-        },
-        resetSeed: function() {
-          this.resetRandSeed()
-          this.resetRandminterSeed()
-        },
-
         iteration: search.get('fxiteration') || 1,
         context: search.get("fxcontext") || "standalone",
 
@@ -542,6 +531,18 @@
           }
         },
       }
+      const resetFxRand = () => {
+        fxrand = sfc32(...matcher(fxhash, 2))
+        $fx.rand = fxrand
+        fxrand.reset = resetFxRand
+      }
+      fxrand.reset = resetFxRand
+      const resetFxRandMinter = () => {
+        fxrandminter = sfc32(...matcher(fxminter, 3))
+        $fx.randminter = fxrandminter
+        fxrandminter.reset = resetFxRandMinter
+      }
+      fxrandminter.reset = resetFxRandMinter
       window.addEventListener("message", (event) => {
         if (event.data === "fxhash_getInfo") {
           parent.postMessage({
@@ -566,17 +567,8 @@
       })
       // END NEW
 
-      // allow the fxrand function to be reset
-      const resetFxRand = () => {
-        fxrand = sfc32(...matcher(fxhash, 2))
-        $fx.rand = fxrand
-        fxrand.reset = resetFxRand
-      }
-      fxrand.reset = resetFxRand
-
       //---- /do not edit the following code
     </script>
-
     <link rel="stylesheet" href="./style.css">
 
     <!-- if you need to import js scripts do it here -->
