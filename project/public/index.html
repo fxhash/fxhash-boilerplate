@@ -439,7 +439,7 @@
         rand: fxrand,
         minter: fxminter,
         randminter: fxrandminter,
-        iteration: search.get('fxiteration') || 1,
+        iteration: Number(search.get('fxiteration')) || 1,
         context: search.get("fxcontext") || "standalone",
 
         preview: fxpreview,
