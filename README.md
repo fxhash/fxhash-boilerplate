@@ -1,6 +1,24 @@
-# fx(hash) boilerplate 2.0
+# FXHACKATHON 2023 boilerplate 💻
 
 A boilerplate to automate and ease the creation of Generative Tokens on fx(hash) using fx(params).
+
+## Overview
+
+> This project is based on the main boilerplate, while providing an implementation example for code-driven parameters.
+
+We prepared a few files in the project:
+
+- index.js
+- minting.js
+- final.js
+- shared.js
+- style.css
+
+We recommend taking a look at these files to understand the logic behind code-driven params, and clearing these for a fresh start when ready to start working on your project.
+
+If you have any question regarding the hackathon, feel free to come on [our discord](https://discord.gg/fxhash) !
+
+## Boilerplate
 
 ### Scope
 
