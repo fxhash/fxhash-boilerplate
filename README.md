@@ -67,8 +67,9 @@ The code snippet exposes the `$fx` object with the following structure:
   getFeature: (id: String) => any, // get feature by id
   getFeatures: () => any, // get all features
   stringifyParams: (definitions) => string, // JSON.stringify that can handle bigint
+  _getInfo: () => {version,hash,iteration,features,params,minter}, // returns all data that is posted to (fx)lens 
   _getInfoHandler: () => void, // post the defined params and features manually to (fx) lens
-  _userGetInfoHandler: undefined | () => void, // an override for posting param definitions 
+  _userGetInfoHandler: null | () => void, // an override handler for preventling immediate response of getInfo event 
 }
 ```
 
@@ -102,7 +103,7 @@ _The index.js of this boilerplate quickly demonstrates a meaningfull configurati
 
 ### Base Attributes
 
-All param share a few base attributes and have each param has a type paramsspecific options attribute to adjust the param to your needs.
+All param share a few base attributes and have each param has a type specific options attribute to adjust the param to your needs.
 
 ```typescript
 {
