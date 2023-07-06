@@ -33,7 +33,7 @@ If you have any question regarding the hackathon, feel free to come on [our disc
 
 ### Getting started
 
-- Clone this repository: `npx degit fxhash/params-boilerplate#hackathon-2023 your_project_name`
+- Clone this repository: `npx degit fxhash/fxhash-boilerplate#hackathon-2023 your_project_name`
 - Install dependencies and fx(lens): `npm install`
 
 ## Start developing your token project
