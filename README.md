@@ -33,7 +33,7 @@ If you have any question regarding the hackathon, feel free to come on [our disc
 
 ### Getting started
 
-- Clone this repository: `npx degit fxhash/params-boilerplate#hackathon-2023 your_project_name`
+- Clone this repository: `npx degit fxhash/fxhash-boilerplate#hackathon-2023 your_project_name`
 - Install dependencies and fx(lens): `npm install`
 
 ## Start developing your token project
@@ -67,6 +67,8 @@ The code snippet exposes the `$fx` object with the following structure:
   getFeature: (id: String) => any, // get feature by id
   getFeatures: () => any, // get all features
   stringifyParams: (definitions) => string, // JSON.stringify that can handle bigint
+  _getInfoHandler: () => void, // post the defined params and features manually to (fx) lens
+  _userGetInfoHandler: undefined | () => void, // an override for posting param definitions 
 }
 ```
 
@@ -100,7 +102,7 @@ _The index.js of this boilerplate quickly demonstrates a meaningfull configurati
 
 ### Base Attributes
 
-All param share a few base attributes and have each param has a type specific options attribute to adjust the param to your needs.
+All param share a few base attributes and have each param has a type paramsspecific options attribute to adjust the param to your needs.
 
 ```typescript
 {
@@ -229,10 +231,74 @@ _not transformed_
 }
 ```
 
+## Param Functions 
+
+The fx(snippet) exposes two functions to define the params and features available using the data structures above:
+
+- `params(attrs:[])` with an array of (fx)params attribute types defined
+- `features(feats: {})` with an object of `key:value` parameters that are defined for this iteration
+
 The fx(snippet) exposes two different way to retrieve fx(params) values:
 
 - `getParam` and `getParams` will return the transformed values as described above
 - `getRawParam` and `getRawParams` will return the raw values after being serialized from the bytestring and without any transformation
+
+## Lazy Parameter Definitions
+
+The (fx)lens container will try and request the params for your project as soon as possible, so you will either need to have executed the `$fx.params([])` function call near the beginning of your execution before any time consuming functions, or you can define your own handler for when the `getInfo` event is emit'd to be able to delay the response.
+
+```js
+window.$fx._userGetInfoHandler = (event) => {
+  // we *might* have them by now 
+  if (window.$fx.getParams()) {
+    // we got them submit if havent already
+    window.$fx._getInfoHandler();
+  }
+};
+
+// defaut to minting
+let contextFn = minting;
+if ($fx.context === "standalone" || $fx.context === "capture") {
+  // define the contextFn that is called when params are made and we start
+  // the main event loop 
+  contextFn = final; // see final.js for implementation
+}
+
+document.body.classList.add($fx.context);
+
+const makeParams = (ready) => {
+  // params are always same but default was calc'd
+  // or pick a reasons
+  const waiting = 1000 + $fx.rand() * 3000;
+  setTimeout(() => {
+    $fx.params([
+      ...,
+     {
+        id: "waited",
+        name: "Waited",
+        type: "number",
+        update: "code-driven",
+        default: waiting,
+        options: {
+          min: 0.01,
+          max: 20000,
+          step: 0.00001,
+        },
+      },
+    ]);
+    if (ready) ready();
+  }, waiting);
+};
+
+// make params that may not complete too fast
+// callback to run postmessage when they are...
+makeParams(() => {
+  // post params to lens
+  window.$fx._getInfoHandler(parent);
+  // continue with context mode
+  contextFn();
+});
+```
 
 ## Start your project with fx(lens)
 
