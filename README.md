@@ -247,7 +247,7 @@ The fx(snippet) exposes two different way to retrieve fx(params) values:
 
 The (fx)lens container will try and request the params for your project as soon as possible, so you will either need to have executed the `$fx.params([])` function call near the beginning of your execution before any time consuming functions, or you can define your own handler for when the `getInfo` event is emit'd to be able to delay the response.
 
-```js
+```javascript
 window.$fx._userGetInfoHandler = (event) => {
   // we *might* have them by now 
   if (window.$fx.getParams()) {
@@ -266,6 +266,8 @@ if ($fx.context === "standalone" || $fx.context === "capture") {
 
 document.body.classList.add($fx.context);
 
+// an example function to show how you handle lazy posting of
+// params to (fx)lens with the `$fx.params` function
 const makeParams = (ready) => {
   // params are always same but default was calc'd
   // or pick a reasons
@@ -290,14 +292,17 @@ const makeParams = (ready) => {
   }, waiting);
 };
 
-// make params that may not complete too fast
-// callback to run postmessage when they are...
+// becausse make params that may not complete too fast
+// we pass a callback to run `_getInfoHandler` when it is done
+// when we set `_getUserInfoHandler` the params are not returned
+// immediately and only when we call it ourselves
 makeParams(() => {
   // post params to lens
   window.$fx._getInfoHandler(parent);
-  // continue with context mode
+  // continue with context mode defined
   contextFn();
 });
+
 ```
 
 ## Start your project with fx(lens)
