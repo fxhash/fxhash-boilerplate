@@ -15,7 +15,7 @@ A boilerplate to automate and ease the creation of Generative Tokens on fx(hash)
 
 ### Getting started
 
-- Clone this repository: `npx degit fxhash/params-boilerplate your_project_name`
+- Clone this repository: `npx degit fxhash/fxhash-boilerplate your_project_name`
 - Install dependencies and fx(lens): `npm install`
 
 ## Start developing your token project
