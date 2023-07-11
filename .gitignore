@@ -1,0 +1,4 @@
+lib/fxlens/**
+node_modules
+dist
+dist-zipped
