@@ -38,8 +38,8 @@
         // setTimeout(() => fxpreview(), 500)
       }
       // get the byte params from the URL
-      const searchParams = search.get("fxparams")
-      let initialInputBytes = searchParams?.replace("0x", "")
+      const searchParams = window.location.hash
+      let initialInputBytes = searchParams?.replace("#0x", "")
       const throttle = (func, delay) => {
         let isThrottled = false
 
