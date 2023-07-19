@@ -271,7 +271,7 @@
             const len = input.length / 2
             const uint8 = new Uint8Array(len)
             let idx
-            for (let i = 0; i < len; i += 2) {
+            for (let i = 0; i < len; i++) {
               idx = i*2
               uint8[i] = parseInt(`${input[idx]}${input[idx + 1]}`, 16)
             }
