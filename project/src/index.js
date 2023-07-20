@@ -29,8 +29,8 @@
  *  - "minting": display the minting interface
  */
 
-import final from "./final";
-import minting from "./minting";
+import final from "./final"
+import minting from "./minting"
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // params are defined at the top-level
@@ -75,22 +75,22 @@ $fx.params([
       step: 0.00001,
     },
   },
-]);
+])
 
 // we add the context as a class to the body, this way we can fine-tune the
 // elements in CSS based on the context
-document.body.classList.add($fx.context);
+document.body.classList.add($fx.context)
 
 // the piece is executed in "minting" mode; so we need to display a custom
 // minting interface; this can be anything, it doesn't have to be some code
 // running separately; it can also be some interface layered on top of the
 // final output
 if ($fx.context === "minting") {
-  minting(); // see minting.js for implementation
+  minting() // see minting.js for implementation
 }
 // the piece is ran by itself, for the final output or for the capture
 // for instance - in such a case we render the final output based on the inputs
 else {
   // $fx.context === "standalone" || $fx.context === "capture"
-  final(); // see final.js for implementation
+  final() // see final.js for implementation
 }
