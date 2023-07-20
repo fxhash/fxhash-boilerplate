@@ -15,7 +15,6 @@ $fx.params([
     name: "A number/float64",
     type: "number",
     //default: Math.PI,
-    update: "code-driven",
     options: {
       min: 1,
       max: 10,
