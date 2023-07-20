@@ -5,7 +5,7 @@
 //   $fx.randminter.reset();
 // }
 
-const sp = new URLSearchParams(window.location.search);
+const sp = new URLSearchParams(window.location.search)
 //  console.log(sp);
 
 // this is how to define parameters
@@ -80,7 +80,7 @@ $fx.params([
       maxLength: 512,
     },
   },
-]);
+])
 
 // this is how features can be defined
 $fx.features({
@@ -88,7 +88,7 @@ $fx.features({
   "A random boolean": $fx.rand() > 0.5,
   "A random string": ["A", "B", "C", "D"].at(Math.floor($fx.rand() * 4)),
   "Feature from params, its a number": $fx.getParam("number_id"),
-});
+})
 
 function main() {
   // log the parameters, for debugging purposes, artists won't have to do that
@@ -109,13 +109,13 @@ function main() {
   const getContrastTextColor = (backgroundColor) =>
     ((parseInt(backgroundColor, 16) >> 16) & 0xff) > 0xaa
       ? "#000000"
-      : "#ffffff";
+      : "#ffffff"
 
-  const bgcolor = $fx.getParam("color_id").hex.rgba;
-  const textcolor = getContrastTextColor(bgcolor.replace("#", ""));
+  const bgcolor = $fx.getParam("color_id").hex.rgba
+  const textcolor = getContrastTextColor(bgcolor.replace("#", ""))
 
   // update the document based on the parameters
-  document.body.style.background = bgcolor;
+  document.body.style.background = bgcolor
   document.body.innerHTML = `
   <div style="color: ${textcolor};">
     <p>
@@ -140,9 +140,9 @@ function main() {
     ${$fx.stringifyParams($fx.getRawParams())}
     </pre>
   <div>
-  `;
-  const btn = document.createElement("button");
-  btn.textContent = "emit random params";
+  `
+  const btn = document.createElement("button")
+  btn.textContent = "emit random params"
   btn.addEventListener("click", () => {
     $fx.emit("params:update", {
       number_id: $fx.getRandomParam("number_id"),
@@ -152,21 +152,21 @@ function main() {
       color_id: $fx.getRandomParam("color_id"),
       boolean_id: $fx.getRandomParam("boolean_id"),
       string_id: $fx.getRandomParam("string_id"),
-    });
-    main();
-  });
-  document.body.appendChild(btn);
+    })
+    main()
+  })
+  document.body.appendChild(btn)
 }
 
-main();
+main()
 
 $fx.on(
   "params:update",
   (newRawValues) => {
     // opt-out default behaviour
-    if (newRawValues.number_id === 5) return false;
+    if (newRawValues.number_id === 5) return false
     // opt-in default behaviour
-    return true;
+    return true
   },
   (optInDefault, newValues) => main()
-);
+)
