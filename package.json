@@ -15,7 +15,10 @@
   "author": "fxhash",
   "license": "MIT",
   "dependencies": {
+    "@octokit/rest": "^20.0.1",
     "adm-zip": "^0.5.9",
+    "axios": "^1.4.0",
+    "boxen": "^7.1.1",
     "chalk": "^4.1.2",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
@@ -31,6 +34,8 @@
   "devDependencies": {
     "@types/adm-zip": "^0.5.0",
     "@types/chalk": "^2.2.0",
-    "@types/express": "^4.17.17"
+    "@types/express": "^4.17.17",
+    "keyv": "^4.5.3",
+    "yesno": "^0.4.0"
   }
 }
