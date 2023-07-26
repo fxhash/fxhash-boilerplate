@@ -1,3 +1,5 @@
+lib/files/fxlens/**
 node_modules
 dist
 dist-zipped
+lib/fxhash-lock.json
