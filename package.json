@@ -1,5 +1,6 @@
 {
   "name": "fxhash-boilerplate",
+  "private": true,
   "version": "2.0.0",
   "description": "The fxhash boilerplate, comes with some utilities to create a project for fxhash",
   "main": "index.js",
