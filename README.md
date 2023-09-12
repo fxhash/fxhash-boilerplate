@@ -1,29 +1,29 @@
-# fx(hash) boilerplate 2.0
+# fx(hash) boilerplate
 
-A boilerplate to automate and ease the creation of Generative Tokens on fx(hash) using fx(params).
+This boilerplates demonstrates the most simple version of a project published on the fx(hash) platform. There is no external tools required in order to publish a generative artwork based on this boilerplate. You just have to create a zip-file with the contents of the `/src` folder.
 
-### Scope
+As long as you are complying to some basic guidlines this zip-file can be published on the fx(hash) platform:
 
-- provide a local environment in which you can iterate and use modern features from the javascript ecosystem
-- interactive environment to test your project with different seeds and params, called fx(lens)
-- automate the creation of a .zip file ready to be uploaded on fxhash
+- You have developed your project with the latest version of the fxhash-snippet
+- All files you need must be in the same directory as your index.html
+- You are not doing any request to external resources in your project. All path must be relative
 
-### Prerequisites
+### Using the `@fxhash/cli` toolkit
 
+The `@fxhash/cli` provides an interface to differet kind of tools that help you developing your generative artwork.
+
+To use the `@fxhash/cli` you must have the following software installed:
 - node >= 14
 - npm >= 6.14.4
 
-### Getting started
-
-- Clone this repository: `npx degit fxhash/fxhash-boilerplate your_project_name`
-- Install dependencies and fx(lens): `npm install`
+You don't need to pre-install the `@fxhash/cli`. You have direct access to the interface via `npx fxhash <commmand> [option]`.
 
 ## Start developing your token project
 
-- `npm start`: Starts a local http server serving your project within fxlens and hot reloading enabled
+- `npx fxhash dev`: Starts a local http server serving your project within fxlens and hot reloading enabled
 - Your browser should open automatically otherwise visit `http://localhost:3000/?target=http://localhost:3301/` to see your project in the browser
 
-### fx(hash) snippet / fx(snippet)
+### fx(hash) API
 
 fxhash requires you to use a javascript code snippet so that the platform can inject some code when tokens will be generated from your Generative Token. The code snippet is already in the `index.html` file of this boilerplate, so you don't have to add it yourself.
 
@@ -220,17 +220,15 @@ The fx(snippet) exposes two different way to retrieve fx(params) values:
 
 The fx(lens) offers an interactive environment to tweak and develop your generative token project.
 
-- `npm start`: Starts two local http server
+- `npx fxhash dev`: Starts two local http server
   - `localhost:3301` serves your project with live reloading
   - `localhost:3300` serves fx(lens) you can connect to a token
 - Visìt `http://localhost:3300/?target=http://localhost:3301` to see your local project within fx(lens)
 
 ## Publish your project
 
-> **⚠️ Disclaimer**: Sandbox is not yet compatible with fx(params).
-
-- `npm run build`: Will create `dist-zipped/project.zip` file
+- `npx fxhash build`: Will create `.dist.zip` file
 
 Go to https://fxhash.xyz/sandbox/ and upload the project.zip file in there to see if it works properly. If your token does not work properly, you can iterate easily by updating your files, running $ npm run build again, and upload the zip file again.
 
-Finally, you can mint your token using the same `project.zip` file.
+Finally, you can mint your token using the same `dist.zip` file.
