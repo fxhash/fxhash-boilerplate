@@ -1,6 +1,6 @@
 # fx(hash) boilerplate
 
-This boilerplates demonstrates the most simple version of a project published on the fx(hash) platform. There is no external tools required in order to publish a generative artwork based on this boilerplate. You just have to create a zip-file with the contents of the `/src` folder.
+This boilerplates demonstrates the most simple version of a project published on the fx(hash) platform. There are no external tools required in order to publish a generative artwork based on this boilerplate. You just have to create a zip-file with the contents of the `/src` folder.
 
 As long as you are complying to some basic guidlines this zip-file can be published on the fx(hash) platform:
 
