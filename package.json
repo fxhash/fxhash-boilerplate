@@ -7,11 +7,6 @@
   "directories": {
     "lib": "lib"
   },
-  "scripts": {
-    "start": "node ./lib/scripts/start.js",
-    "start:project": "webpack serve --config ./lib/config/webpack.config.dev.js",
-    "build": "webpack --config ./lib/config/webpack.config.prod.js"
-  },
   "author": "fxhash",
   "license": "MIT",
   "dependencies": {
@@ -37,5 +32,10 @@
     "@types/express": "4.17.17",
     "keyv": "4.5.3",
     "yesno": "0.4.0"
+  },
+  "scripts": {
+    "start": "node ./lib/scripts/start.js",
+    "start:project": "webpack serve --config ./lib/config/webpack.config.dev.js",
+    "build": "webpack --config ./lib/config/webpack.config.prod.js"
   }
 }
