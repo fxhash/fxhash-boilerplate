@@ -106,7 +106,7 @@ function main() {
   // console.log("Single transformed value:");
   // console.log($fx.getParam("color_id"));
 
-  const getContrastTextColor = (backgroundColor) =>
+  const getContrastTextColor = backgroundColor =>
     ((parseInt(backgroundColor, 16) >> 16) & 0xff) > 0xaa
       ? "#000000"
       : "#ffffff"
@@ -162,7 +162,7 @@ main()
 
 $fx.on(
   "params:update",
-  (newRawValues) => {
+  newRawValues => {
     // opt-out default behaviour
     if (newRawValues.number_id === 5) return false
     // opt-in default behaviour
