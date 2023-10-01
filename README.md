@@ -134,7 +134,7 @@ No options.
 Options:
 
 ```typescript
-undefined;
+undefined
 ```
 
 #### `color`
@@ -144,7 +144,7 @@ No options.
 Options:
 
 ```typescript
-undefined;
+undefined
 ```
 
 #### `string`
