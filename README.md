@@ -84,5 +84,3 @@ fxhash eject
 ```
 
 This will transform your simple project structure into the ejected project structure. But be aware this change is not reversable via the `@fxhash/cli`.
-
-
