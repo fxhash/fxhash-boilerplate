@@ -475,7 +475,7 @@
       },
       getRandomParam: function(id) {
         const definition = this._params.find((d) => d.id === id);
-        const processor = processors[definition.type];
+        const processor = ParameterProcessors[definition.type];
         return processor.random(definition);
       },
       getDefinitions: function() {
