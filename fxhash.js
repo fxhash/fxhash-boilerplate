@@ -40,7 +40,7 @@
     return sfc32(matcher(fxhash, start));
   }
 
-  // ../fxhash-params/dist/chunk-VBATU6NJ.js
+  // ../fxhash-params/dist/chunk-FZWZHHQ2.js
   function completeHexColor(hexCode) {
     let hex = hexCode.replace("#", "");
     if (hex.length === 6) {
@@ -311,7 +311,6 @@
   }
   function deserializeParams(bytes, definition, options) {
     const params = {};
-    console.log(bytes, definition, options);
     for (const def of definition) {
       const processor = ParameterProcessors[def.type];
       const transformer = options.withTransform && processor[options.transformType || "transform"];
@@ -440,14 +439,14 @@
       preview: fxpreview,
       isPreview: isFxpreview,
       params: function(definition) {
-        this._params = definition;
-        this._rawValues = deserializeParams(initialInputBytes, definition, {
+        this._params = definition.map((def) => ({ ...def, version: this._version }));
+        this._rawValues = deserializeParams(initialInputBytes, this._params, {
           withTransform: true,
           transformType: "constrain"
         });
         this._paramValues = processParams(
           this._rawValues,
-          definition,
+          this._params,
           "transform"
         );
         this._updateInputBytes();
@@ -475,7 +474,7 @@
       },
       getRandomParam: function(id) {
         const definition = this._params.find((d) => d.id === id);
-        const processor = processors[definition.type];
+        const processor = ParameterProcessors[definition.type];
         return processor.random(definition);
       },
       getDefinitions: function() {
@@ -572,4 +571,4 @@
   // src/index.ts
   window.$fx = createFxhashSdk(window, {});
 })();
-//# sourceMappingURL=index.global.js.map
+//# sourceMappingURL=fxhash.js.map
