@@ -1,236 +1,86 @@
-# fx(hash) boilerplate 2.0
+# fx(hash) boilerplate
 
-A boilerplate to automate and ease the creation of Generative Tokens on fx(hash) using fx(params).
+A boilerplate for the creation of generative art that can be published on fx(hash).
 
-### Scope
+## Introduction
 
-- provide a local environment in which you can iterate and use modern features from the javascript ecosystem
-- interactive environment to test your project with different seeds and params, called fx(lens)
-- automate the creation of a .zip file ready to be uploaded on fxhash
+This repository contains the most simple and recommended setup to publish a generative artwork on fxhash. You can do modifications to the existing files, create a zip that contains all of them and upload it on fxhash.xyz.
 
-### Prerequisites
+This are the hard facts of the required setup:
+- A html entry point called `index.html`
+- The `@fxhash/project-sdk` as a local script file included in the html entry point called `./fxhash.js`
+- A script that generates the generative art included in the html entry point called `index.js`
 
-- node >= 14
-- npm >= 6.14.4
+Anything else from there is optional (even this README 🙃). The boilerplate contains a .css file but this is theoretically not needed if you don't want to set any css.
+For a better developer experience we are offering the `@fxhash/cli` that will help you to create your generative artwork. 
 
-### Getting started
+The rest of the README will actually speak about the usage of the `@fxhash/cli`. 
 
-- Clone this repository: `npx degit fxhash/fxhash-boilerplate your_project_name`
-- Install dependencies and fx(lens): `npm install`
+## Prerequisites
 
-## Start developing your token project
+- `node >= 14`
+- `pnpm >= 6.14.4`
 
-- `npm start`: Starts a local http server serving your project within fxlens and hot reloading enabled
-- Your browser should open automatically otherwise visit `http://localhost:3000/?target=http://localhost:3301/` to see your project in the browser
+That's it you are ready to develop your artwork with the `@fxhash/cli`
 
-### fx(hash) snippet / fx(snippet)
+### Creating a new project
 
-fxhash requires you to use a javascript code snippet so that the platform can inject some code when tokens will be generated from your Generative Token. The code snippet is already in the `index.html` file of this boilerplate, so you don't have to add it yourself.
+You probably think: "Why we start with creating a project if I am using the boilerplate?". Thats because you don't need to clone the boilerplate to start a project. You can create a project by using the `@fxhash/cli`. 
 
-**During the development stages, the snippet will generate a random hash each time the page is refreshed**. This way, it helps you reproduce the conditions in which your token will be executed on fxhash.
-
-The code snippet exposes the `$fx` object with the following structure:
-
-```typescript
-{
-  hash: String, // a random 64 characters hexadecimal string. This particular variable will be hardcoded with a static hash when someone mints a token from your GT
-  rand: () => Number, // a PRNG function seeded with the hash, that generates deterministic PRN between 0 and 1
-  minter: String, // The string of the wallet address of the minter injected into the iteration
-  randminter: () => Number, // a PRNG function seeded with the minter address that generates deterministic PRN between 0 and 1
-  preview: () => void, // trigger for capture module
-  isPreview: Boolean, // is TRUE when capture module is running the project
-  params: (definitions) => void, // sets your projects fx(params) definitions
-  getParam: (id: String) => any, // get transformed fx(params) value by id
-  getParams: () => any, // get all transformed fx(params) values
-  getRawParam: (id: String) => any, // get raw fx(params) value by id
-  getRawParams: () => any, // get all raw fx(params) values
-  getDefinitions: () => any, // get all fx(params) definitions
-  features: (features) => void, // sets your projects features
-  getFeature: (id: String) => any, // get feature by id
-  getFeatures: () => any, // get all features
-  stringifyParams: (definitions) => string, // JSON.stringify that can handle bigint
-}
+```
+npx fxhash create
 ```
 
-_The index.js of this boilerplate quickly demonstrates how to use the whole "SDK"_.
+This command will prompt you with the dialog to create a new project. Give your project a name and choose the "simple" project template. You just created your first project. We will speak about the "ejected" template later.
 
-### How do Generative Tokens work
+> The first time you run npx fxhash <command> npm is actually installing the `@fxhash/cli` package globally on your computer.
 
-This is how Generative Tokens work on fxhash:
+### Starting the development environment
 
-- you upload your project to the platform (see next section)
-- you mint your project
-- when a collector will mint its unique token from your Generative Token, a random hash will be hard-coded in the fxhash code snippet
-- the token will now have its own index.html file, with a static hash, ensuring its immutability
+The whole fx(lens) environment is exposed via the `@fxhash/cli`. So you just have to run the following command in the root of your project.
 
-The [Guide to mint a Generative Token](https://www.fxhash.xyz/doc/artist/guide-publish-generative-token) give in-depth details about this process.
-
-## fx(params) types
-
-The following fx(params) types are available. All types share the same attributes but have different options available to e.g. constrain your parameters to your needs.
-
-The available fx(params) types are:
-
-- `number`: `Number` aka float64
-- `bigint`: `BigInt` aka int64
-- `boolean`: `boolean`
-- `color`: Color in 8-hexdigit and abbreviations
-- `string`: String with max 64 characters
-- `select`: Selection of provided options options
-
-_The index.js of this boilerplate quickly demonstrates a meaningfull configuration for each fx(params) type_.
-
-### Base Attributes
-
-All param share a few base attributes and have each param has a type specific options attribute to adjust the param to your needs.
-
-```typescript
-{
-  id: string, // required
-  name?: string, // optional, if not defined name == id
-  type: "number" | "bigint" | "boolean" | "color" | "string" | "select", // required
-  default?: string | number | bigint | boolean, // optional (see Randomization)
-  options: TYPE_SPECIFIC_OPTIONS, // different options per type (see below)
-}
+```
+npx fxhash dev
 ```
 
-### Randomization
+This will open up the fx(lens) environment in your browser. In the backend two servers are running: 
+- `http://localhost:3300` serves fx(lens) you can connect to a token
+- `http://localhost:3301` serves your project with live reloading
 
-The fxhash snippet generates a random value for each parameter. The random value generation happens within the defined constrains of the parameter definition. Each parameter has the possibility to define a `default` value. Setting the default will prevent the parameter to be initialised with a random value. This can be relevant during the development stage but is also relevant to consider for the final minting flow, when the user will define the final parameter configuration for the uniquely minted token.
+### Building your project
 
-### Type specific options
-
-#### `number`
-
-All options are optional.
-
-Options:
-
-```typescript
-{
-  min?: number,
-  max?: number,
-  step?: number,
-}
+```
+npx fxhash build
 ```
 
-#### `bigint`
+Will build your project and create an `upload.zip` that you can use to publish your artwork on fxhash.xyz
 
-All options are optional.
+## Advanced usage: Ejected Project
 
-Options:
+When you created your first project with `fxhash create` you saw that there is a second project template you can choose: "ejected"
 
-```typescript
-{
-  min?: number | bigint,
-  max?: number | bigint,
-}
+If you want to use a package manager to install dependencies for your project or customize how webpack builds your project, the "ejected" template provides all those functionalities. 
+
+The structure of the ejected template will look like this:
+```
+├─ package.json
+├─ webpack.dev.config.js
+├─ webpack.prod.config.js
+├─ src/
+  ├─ index.html
+  ├─ index.js
+  ├─ fxhash.js
+  ├─ LICENSE
 ```
 
-#### `boolean`
+You can still use all the functionality the `@fxhash/cli` provides, but e.g. customize the webpack configuration for the `fxhash dev`(webpack.dev.config.js) and `fxhash build` (webpack.prod.config.js) commands.
 
-No options.
+### Going from simple to ejected
 
-Options:
+Even if you started your project with a simple template you can go all "ejected" by running
 
-```typescript
-undefined;
+```
+fxhash eject
 ```
 
-#### `color`
-
-No options.
-
-Options:
-
-```typescript
-undefined;
-```
-
-#### `string`
-
-All options are optional.
-
-Options:
-
-```typescript
-{
-  minLength?: number,
-  maxLength?: number,
-}
-```
-
-#### `select`
-
-Options are required. They define the options of the select
-
-Options:
-
-```typescript
-{
-  options: string[],
-}
-```
-
-### Transformation
-
-For ease of usage the fx(params) are being transformed into their type specific representation.
-
-#### `number`
-
-[getFloat64](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView/getFloat64)
-
-#### `bigint`
-
-[getBigInt64](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView/getBigInt64)
-
-#### `boolean`
-
-_not transformed_
-
-#### `string`
-
-_not transformed_
-
-#### `color`
-
-```typescript
-{
- hex: {
-  rgb: '#ff0000',
-  rgba: '#ff0000ff',
- },
- obj: {
-  rgb: { r, g, b},
-  rgba: { r, g, b, a },
- },
- arr: {
-  rgb: [r,g,b],
-  rgba: [r,g,b,a],
- },
-}
-```
-
-The fx(snippet) exposes two different way to retrieve fx(params) values:
-
-- `getParam` and `getParams` will return the transformed values as described above
-- `getRawParam` and `getRawParams` will return the raw values after being serialized from the bytestring and without any transformation
-
-## Start your project with fx(lens)
-
-The fx(lens) offers an interactive environment to tweak and develop your generative token project.
-
-- `npm start`: Starts two local http server
-  - `localhost:3301` serves your project with live reloading
-  - `localhost:3300` serves fx(lens) you can connect to a token
-- Visìt `http://localhost:3300/?target=http://localhost:3301` to see your local project within fx(lens)
-
-## Publish your project
-
-> **⚠️ Disclaimer**: Sandbox is not yet compatible with fx(params).
-
-- `npm run build`: Will create `dist-zipped/project.zip` file
-
-Go to https://fxhash.xyz/sandbox/ and upload the project.zip file in there to see if it works properly. If your token does not work properly, you can iterate easily by updating your files, running $ npm run build again, and upload the zip file again.
-
-Finally, you can mint your token using the same `project.zip` file.
+This will transform your simple project structure into the ejected project structure. But be aware this change is not reversable via the `@fxhash/cli`.
