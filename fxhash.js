@@ -358,7 +358,8 @@
     let fxrandminter = createFxRandom(fxminter, 3);
     const isFxpreview = search.get("preview") === "1";
     function fxpreview() {
-      console.log("FXPREVIEW");
+      window2.dispatchEvent(new Event("fxhash-preview"));
+      setTimeout(() => fxpreview(), 500);
     }
     const searchParams = window2.location.hash;
     const initialInputBytes = searchParams?.replace("#0x", "");
