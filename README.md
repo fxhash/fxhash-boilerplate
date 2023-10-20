@@ -18,8 +18,8 @@ The rest of the README will actually speak about the usage of the `@fxhash/cli`.
 
 ## Prerequisites
 
-- `node >= 14`
-- `pnpm >= 6.14.4`
+- `node >= 18.0.0`
+- `npm >= 9.0.0`
 
 That's it you are ready to develop your artwork with the `@fxhash/cli`
 
