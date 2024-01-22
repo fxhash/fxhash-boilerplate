@@ -9,7 +9,7 @@ This repository contains the most simple and recommended setup to publish a gene
 This are the hard facts of the required setup:
 
 - A html entry point called `index.html`
-- The `@fxhash/project-sdk` as a local script file included in the html entry point called `./fxhash.js`
+- The `@fxhash/project-sdk` as a local script file included in the html entry point called `./fxhash.min.js`
 - A script that generates the generative art included in the html entry point called `index.js`
 
 Anything else from there is optional (even this README 🙃). The boilerplate contains a .css file but this is theoretically not needed if you don't want to set any css.
@@ -72,7 +72,7 @@ The structure of the ejected template will look like this:
 ├─ src/
   ├─ index.html
   ├─ index.js
-  ├─ fxhash.js
+  ├─ fxhash.min.js
   ├─ LICENSE
 ```
 
